@@ -49,6 +49,9 @@ public class Lexer {
             token = processOperator(nextChar);
         }
 
+        if (token == null) {
+            return new Token(TokenType.ERROR);
+        }
         return token;
     }
 

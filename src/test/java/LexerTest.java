@@ -46,6 +46,15 @@ public class LexerTest {
     }
 
     @Test
+    public void shouldParseModuloOperator() {
+        Lexer lexer = new Lexer(new InputManager("%"));
+
+        Token token = lexer.getNextToken();
+
+        assertEquals(TokenType.MODULO, token.getTokenType());
+    }
+
+    @Test
     public void shouldParseDot() {
         Lexer lexer = new Lexer(new InputManager("."));
 
@@ -309,5 +318,14 @@ public class LexerTest {
             assertEquals(TokenType.FUNCTION, token.getTokenType());
             assertEquals(functionNames[i], token.getStringValue());
         }
+    }
+
+    @Test
+    public void shouldShowError() {
+        Lexer lexer = new Lexer(new InputManager("^"));
+
+        Token token = lexer.getNextToken();
+
+        assertEquals(TokenType.ERROR, token.getTokenType());
     }
 }

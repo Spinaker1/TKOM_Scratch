@@ -12,6 +12,7 @@ class KeywordsOperatorsHashmap {
         put("-", new Token(TokenType.MINUS));
         put("*", new Token(TokenType.MULTIPLY));
         put("/", new Token(TokenType.DIVIDE));
+        put("%", new Token(TokenType.MODULO));
         put(";", new Token(TokenType.SEMICOLON));
         put(".", new Token(TokenType.DOT));
         put("{", new Token(TokenType.BRACKET_OPEN));
