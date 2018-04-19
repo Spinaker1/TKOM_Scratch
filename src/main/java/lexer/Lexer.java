@@ -80,6 +80,8 @@ public class Lexer {
             string += getNextChar();
         }
 
+        getNextChar();
+
         return new Token(TokenType.STRING, string);
     }
 

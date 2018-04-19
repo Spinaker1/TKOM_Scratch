@@ -1,9 +1,9 @@
-package lexer;
 
 import input.InputManager;
 import org.junit.Test;
 import token.Token;
 import token.TokenType;
+import lexer.Lexer;
 
 import static org.junit.Assert.*;
 
@@ -233,7 +233,10 @@ public class LexerTest {
 
     @Test
     public void shouldDeleteComments() {
-        String value = ("//komentarz\n69 //456 \n \"kwoka\"");
+        String value = (
+                "//komentarz\n" +
+                "69 //456 \n" +
+                " \"kwoka\"");
         Lexer lexer = new Lexer(new InputManager(value));
 
         Token token1 = lexer.getNextToken();
@@ -274,6 +277,7 @@ public class LexerTest {
 
         assertEquals(TokenType.REPEAT, token.getTokenType());
     }
+
     @Test
     public void shouldParseRepeatIfKeyword() {
         String value = "powtorzJezeli";
@@ -327,5 +331,69 @@ public class LexerTest {
         Token token = lexer.getNextToken();
 
         assertEquals(TokenType.ERROR, token.getTokenType());
+    }
+
+    @Test
+    public void shouldCorrectlyParseAllTokens() {
+        String value = "idzLewo(50); //Idę w lewo 50 pikseli \n" +
+                "jezeli (a == 4) { c = \"kwiat\"; }\n";
+        Lexer lexer = new Lexer(new InputManager(value));
+
+        Token token = lexer.getNextToken();
+        assertEquals(TokenType.FUNCTION, token.getTokenType());
+        assertEquals("idzLewo", token.getStringValue());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.PARENTHESIS_OPEN, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.INTEGER, token.getTokenType());
+        assertEquals(50, token.getIntValue());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.PARENTHESIS_CLOSE, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.SEMICOLON, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.IF, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.PARENTHESIS_OPEN, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.VARIABLE, token.getTokenType());
+        assertEquals("a", token.getStringValue());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.EQUAL, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.INTEGER, token.getTokenType());
+        assertEquals(4, token.getIntValue());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.PARENTHESIS_CLOSE, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.BRACKET_OPEN, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.VARIABLE, token.getTokenType());
+        assertEquals("c", token.getStringValue());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.ASSIGNMENT, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.STRING, token.getTokenType());
+        assertEquals("kwiat", token.getStringValue());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.SEMICOLON, token.getTokenType());
+
+        token = lexer.getNextToken();
+        assertEquals(TokenType.BRACKET_CLOSE, token.getTokenType());
     }
 }
