@@ -20,18 +20,25 @@ public class Lexer {
         return inputManager.peek();
     }
 
+    private boolean isEoF() { return inputManager.isEoF(); }
+
     public Token getNextToken() {
         char nextChar = getNextChar();
 
+        if (isEoF()) {
+            return new Token(TokenType.EOF);
+        }
+
         //delete white spaces
-        while (Character.isWhitespace(nextChar)) {
+        while (Character.isWhitespace(nextChar) && !isEoF()) {
             nextChar = getNextChar();
         }
 
         //delete comments
         if (nextChar == '/' && peek() == '/') {
             int lineNumber = inputManager.getLineNumber();
-            while(lineNumber == inputManager.getLineNumber() || Character.isWhitespace(nextChar)) {
+
+            while((lineNumber == inputManager.getLineNumber() || Character.isWhitespace(nextChar)) && !isEoF()) {
                 nextChar = getNextChar();
             }
         }
@@ -59,7 +66,7 @@ public class Lexer {
         String string = "";
         string += nextChar;
 
-        while (Character.isDigit(peek())) {
+        while (Character.isDigit(peek()) && !isEoF()) {
             string += getNextChar();
         }
 
@@ -69,7 +76,7 @@ public class Lexer {
     private Token processString(char nextChar) {
         String string = "";
 
-        while (peek() != '"') {
+        while (peek() != '"' && !isEoF()) {
             string += getNextChar();
         }
 
@@ -100,7 +107,7 @@ public class Lexer {
         String string = "";
         string += nextChar;
 
-        while(Character.isLetter(peek()) || Character.isDigit(peek())) {
+        while((Character.isLetter(peek()) || Character.isDigit(peek())) && !isEoF()) {
             string += getNextChar();
         }
 

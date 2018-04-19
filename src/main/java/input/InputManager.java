@@ -11,6 +11,8 @@ public class InputManager {
     private int positionInLine = 0;
     private int lineNumber = 1;
 
+    private char currentChar;
+
     public InputManager(String string) {
          inputStream = new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8));
     }
@@ -30,6 +32,9 @@ public class InputManager {
         }
         catch (IOException e) {
         }
+
+        currentChar = character;
+
         return character;
     }
 
@@ -59,5 +64,9 @@ public class InputManager {
 
     public int getLineNumber() {
         return lineNumber;
+    }
+
+    public boolean isEoF() {
+        return (int) currentChar == -1;
     }
 }
