@@ -1,8 +1,13 @@
+package lexer;
+
+import token.Token;
+import token.TokenType;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class KeywordsOperatorsHashmap {
-    public static Map<String, Token> OPERATORS = new HashMap<String, Token>() {{
+class KeywordsOperatorsHashmap {
+    static Map<String, Token> OPERATORS = new HashMap<String, Token>() {{
         put("+", new Token(TokenType.ADD));
         put("-", new Token(TokenType.MINUS));
         put("*", new Token(TokenType.MULTIPLY));
@@ -24,7 +29,7 @@ public class KeywordsOperatorsHashmap {
         put("=", new Token(TokenType.ASSIGNMENT));
     }};
 
-    public static Map<String, Token> KEYWORDS = new HashMap<String, Token>() {{
+    static Map<String, Token> KEYWORDS = new HashMap<String, Token>() {{
         put("jezeli", new Token(TokenType.IF));
         put("inaczej", new Token(TokenType.ELSE));
         put("powtorz", new Token(TokenType.REPEAT));

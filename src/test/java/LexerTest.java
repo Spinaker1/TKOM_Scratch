@@ -1,4 +1,8 @@
+import input.InputManager;
+import lexer.Lexer;
 import org.junit.Test;
+import token.Token;
+import token.TokenType;
 
 import static org.junit.Assert.*;
 
@@ -241,7 +245,7 @@ public class LexerTest {
 
         assertEquals(TokenType.ELSE, token.getTokenType());
     }
-    
+
     @Test
     public void shouldParseRepeatKeyword() {
         String value = "powtorz";

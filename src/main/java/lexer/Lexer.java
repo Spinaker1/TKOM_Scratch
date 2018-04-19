@@ -1,7 +1,14 @@
+package lexer;
+
+import token.Token;
+import token.TokenType;
+
+import input.InputManager;
+
 public class Lexer {
     private InputManager inputManager;
 
-    Lexer(InputManager inputManager) {
+    public Lexer(InputManager inputManager) {
         this.inputManager = inputManager;
     }
 

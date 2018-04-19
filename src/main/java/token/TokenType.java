@@ -1,3 +1,5 @@
+package token;
+
 public enum TokenType {
     INTEGER,
     STRING,
