@@ -102,10 +102,17 @@ public class Lexer {
         }
 
         Token token = KeywordsOperatorsHashmap.KEYWORDS.get(string);
-
         if (token != null)
             return token;
-        else
-            return new Token(TokenType.VARIABLE,string);
+
+        token = Events.get(string);
+        if (token != null)
+            return token;
+
+        token = Functions.get(string);
+        if (token != null)
+            return token;
+
+        return new Token(TokenType.VARIABLE,string);
     }
 }

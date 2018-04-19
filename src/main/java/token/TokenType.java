@@ -16,6 +16,7 @@ public enum TokenType {
     BRACKET_OPEN,
     BRACKET_CLOSE,
     AND,
+    NEGATION,
     OR,
     LESS,
     GREATER,
@@ -26,5 +27,7 @@ public enum TokenType {
     ELSE,
     REPEAT,
     REPEAT_IF,
-    VARIABLE
+    VARIABLE,
+    EVENT,
+    FUNCTION
 }

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class KeywordsOperatorsHashmap {
-    static Map<String, Token> OPERATORS = new HashMap<String, Token>() {{
+    static final Map<String, Token> OPERATORS = new HashMap<String, Token>() {{
         put("+", new Token(TokenType.ADD));
         put("-", new Token(TokenType.MINUS));
         put("*", new Token(TokenType.MULTIPLY));
@@ -22,6 +22,7 @@ class KeywordsOperatorsHashmap {
         put("!=", new Token(TokenType.NOT_EQUAL));
         put("&&", new Token(TokenType.AND));
         put("||", new Token(TokenType.OR));
+        put("!", new Token(TokenType.NEGATION));
         put("<", new Token(TokenType.LESS));
         put(">", new Token(TokenType.GREATER));
         put("<=", new Token(TokenType.LESS_EQUAL));
@@ -29,7 +30,7 @@ class KeywordsOperatorsHashmap {
         put("=", new Token(TokenType.ASSIGNMENT));
     }};
 
-    static Map<String, Token> KEYWORDS = new HashMap<String, Token>() {{
+    static final Map<String, Token> KEYWORDS = new HashMap<String, Token>() {{
         put("jezeli", new Token(TokenType.IF));
         put("inaczej", new Token(TokenType.ELSE));
         put("powtorz", new Token(TokenType.REPEAT));

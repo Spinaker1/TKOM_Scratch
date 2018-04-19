@@ -1,5 +1,6 @@
+package lexer;
+
 import input.InputManager;
-import lexer.Lexer;
 import org.junit.Test;
 import token.Token;
 import token.TokenType;
@@ -180,6 +181,15 @@ public class LexerTest {
     }
 
     @Test
+    public void shouldParseNegationOperator() {
+        Lexer lexer = new Lexer(new InputManager("!"));
+
+        Token token = lexer.getNextToken();
+
+        assertEquals(TokenType.NEGATION, token.getTokenType());
+    }
+
+    @Test
     public void shouldParseInt() {
         String value = "123";
         Lexer lexer = new Lexer(new InputManager(value));
@@ -263,5 +273,41 @@ public class LexerTest {
         Token token = lexer.getNextToken();
 
         assertEquals(TokenType.REPEAT_IF, token.getTokenType());
+    }
+
+    @Test
+    public void shouldParseEvents() {
+        String value = "SCIANA START KOLIZJA MYSZ";
+        Lexer lexer = new Lexer(new InputManager(value));
+
+        Token token1 = lexer.getNextToken();
+        Token token2 = lexer.getNextToken();
+        Token token3 = lexer.getNextToken();
+        Token token4 = lexer.getNextToken();
+
+        assertEquals(TokenType.EVENT, token1.getTokenType());
+        assertEquals("SCIANA", token1.getStringValue());
+        assertEquals(TokenType.EVENT, token2.getTokenType());
+        assertEquals("START", token2.getStringValue());
+        assertEquals(TokenType.EVENT, token3.getTokenType());
+        assertEquals("KOLIZJA", token3.getStringValue());
+        assertEquals(TokenType.EVENT, token4.getTokenType());
+        assertEquals("MYSZ", token4.getStringValue());
+    }
+
+    @Test
+    public void shouldParseFunctions() {
+        String[] functionNames = { "idz",	"idzDoMyszy",	"zmienKolor",	"zmienRozmiar",	"powiedz",	"czekaj",
+                "pobierzX",	"pobierzY",	"pobierzRotacje",	"idzLewo",	"idzPrawo",	"idzGora",	"idzDol",
+                "obrocPrawo",	"obrocLewo"};
+
+        for (int i = 0; i < functionNames.length; i++) {
+            Lexer lexer = new Lexer(new InputManager(functionNames[i]));
+
+            Token token = lexer.getNextToken();
+
+            assertEquals(TokenType.FUNCTION, token.getTokenType());
+            assertEquals(functionNames[i], token.getStringValue());
+        }
     }
 }
