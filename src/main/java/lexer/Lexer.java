@@ -25,17 +25,17 @@ public class Lexer {
     public Token getNextToken() {
         char nextChar = getNextChar();
 
+        //delete white spaces
+        while (Character.isWhitespace(nextChar)) {
+            nextChar = getNextChar();
+        }
+
         if (isEoF()) {
             return new Token(TokenType.EOF);
         }
 
-        //delete white spaces
-        while (Character.isWhitespace(nextChar) && !isEoF()) {
-            nextChar = getNextChar();
-        }
-
         //delete comments
-        if (nextChar == '/' && peek() == '/') {
+        if (nextChar == '#') {
             int lineNumber = inputManager.getLineNumber();
 
             while((lineNumber == inputManager.getLineNumber() || Character.isWhitespace(nextChar)) && !isEoF()) {
@@ -43,77 +43,134 @@ public class Lexer {
             }
         }
 
-        Token token;
-
-        if (Character.isDigit(nextChar)) {
-            token = processInteger(nextChar);
-        } else if (nextChar == '"') {
-            token = processString(nextChar);
-        } else if (Character.isLetter(nextChar)) {
-            token = processKeywordOrId(nextChar);
+        if (Character.isDigit(nextChar))
+            return processInteger(nextChar);
+        if (nextChar == '"') {
+            return processString(nextChar);
+        }
+        if (Character.isLetter(nextChar)) {
+            return processKeywordOrId(nextChar);
         }
         else {
-            token = processOperator(nextChar);
+            return processOperator(nextChar);
         }
-
-        if (token == null) {
-            return new Token(TokenType.ERROR);
-        }
-        return token;
     }
 
     private Token processInteger(char nextChar) {
-        String string = "";
-        string += nextChar;
+        if (nextChar == '0')
+            return new Token(TokenType.ERROR);
+
+        int number = nextChar-'0';
 
         while (Character.isDigit(peek()) && !isEoF()) {
-            string += getNextChar();
+            int digit = getNextChar() - '0';
+            number = number*10 + digit;
         }
 
-        return new Token(TokenType.INTEGER, Integer.parseInt(string));
+        return new Token(TokenType.INTEGER, number);
     }
 
     private Token processString(char nextChar) {
-        String string = "";
+        StringBuilder builder = new StringBuilder();
 
         while (peek() != '"' && !isEoF()) {
-            string += getNextChar();
+            builder.append(getNextChar());
         }
 
         getNextChar();
 
-        return new Token(TokenType.STRING, string);
+        return new Token(TokenType.STRING, builder.toString());
     }
 
     private Token processOperator(char nextChar) {
-        String string = "";
-        string += nextChar;
+        switch (nextChar) {
+            case '=':
+                if (peek() == '=') {
+                    getNextChar();
+                    return new Token(TokenType.EQUAL);
+                }
+                return new Token(TokenType.ASSIGNMENT);
 
-        if (nextChar == '=' && peek() == '=')
-            string += getNextChar();
-        if (nextChar == '&' && peek() == '&')
-            string += getNextChar();
-        if (nextChar == '|' && peek() == '|')
-            string += getNextChar();
-        if (nextChar == '!' && peek() == '=')
-            string += getNextChar();
-        if (nextChar == '>' && peek() == '=')
-            string += getNextChar();
-        if (nextChar == '<' && peek() == '=')
-            string += getNextChar();
+            case '&':
+                if (peek() == '&') {
+                    getNextChar();
+                    return new Token(TokenType.AND);
+                }
+                return new Token(TokenType.ERROR);
 
-        return KeywordsOperatorsHashmap.OPERATORS.get(string);
+            case '|':
+                if (peek() == '|') {
+                    getNextChar();
+                    return new Token(TokenType.OR);
+                }
+                return new Token(TokenType.ERROR);
+
+            case '!':
+                if (peek() == '=') {
+                    getNextChar();
+                    return new Token(TokenType.NOT_EQUAL);
+                }
+                return new Token(TokenType.NEGATION);
+
+            case '>':
+                if (peek() == '=') {
+                    getNextChar();
+                    return new Token(TokenType.GREATER_EQUAL);
+                }
+                return new Token(TokenType.GREATER);
+
+            case '<':
+                if (peek() == '=') {
+                    getNextChar();
+                    return new Token(TokenType.LESS_EQUAL);
+                }
+                return new Token(TokenType.LESS);
+
+            case '+':
+                return new Token(TokenType.ADD);
+
+            case '-':
+                return new Token(TokenType.MINUS);
+
+            case '*':
+                return new Token(TokenType.MULTIPLY);
+
+            case '/':
+                return new Token(TokenType.DIVIDE);
+
+            case '%':
+                return new Token(TokenType.MODULO);
+
+            case ';':
+                return new Token(TokenType.SEMICOLON);
+
+            case '{':
+                return new Token(TokenType.BRACKET_OPEN);
+
+            case '}':
+                return new Token(TokenType.BRACKET_CLOSE);
+
+            case '(':
+                return new Token(TokenType.PARENTHESIS_OPEN);
+
+            case ')':
+                return new Token(TokenType.PARENTHESIS_CLOSE);
+        }
+
+        return new Token(TokenType.ERROR);
     }
 
     private Token processKeywordOrId(char nextChar) {
-        String string = "";
-        string += nextChar;
+        StringBuilder builder = new StringBuilder();
+        builder.append(nextChar);
 
         while((Character.isLetter(peek()) || Character.isDigit(peek())) && !isEoF()) {
-            string += getNextChar();
+            builder.append(getNextChar());
         }
 
-        Token token = KeywordsOperatorsHashmap.KEYWORDS.get(string);
+        String string = builder.toString();
+
+        Token token = KeywordsHashmap.KEYWORDS.get(string);
         if (token != null)
             return token;
 

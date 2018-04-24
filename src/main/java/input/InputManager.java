@@ -18,7 +18,7 @@ public class InputManager {
     }
 
     public char getNextChar() {
-        char character = 'd';
+        char character='d';
 
         try {
             character = (char) inputStream.read();

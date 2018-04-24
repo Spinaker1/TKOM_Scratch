@@ -54,14 +54,6 @@ public class LexerTest {
         assertEquals(TokenType.MODULO, token.getTokenType());
     }
 
-    @Test
-    public void shouldParseDot() {
-        Lexer lexer = new Lexer(new InputManager("."));
-
-        Token token = lexer.getNextToken();
-
-        assertEquals(TokenType.DOT, token.getTokenType());
-    }
 
     @Test
     public void shouldParseSemicolon() {
@@ -210,6 +202,16 @@ public class LexerTest {
     }
 
     @Test
+    public void shouldNotParseIntWhichStartsAtZero() {
+        String value = "00123";
+        Lexer lexer = new Lexer(new InputManager(value));
+
+        Token token = lexer.getNextToken();
+
+        assertEquals(TokenType.ERROR, token.getTokenType());
+    }
+
+    @Test
     public void shouldParseString() {
         String value = "\"abc\"";
         Lexer lexer = new Lexer(new InputManager(value));
@@ -234,8 +236,8 @@ public class LexerTest {
     @Test
     public void shouldDeleteComments() {
         String value = (
-                "//komentarz\n" +
-                "69 //456 \n" +
+                "# komentarz\n" +
+                "69 #456 \n" +
                 " \"kwoka\"");
         Lexer lexer = new Lexer(new InputManager(value));
 
@@ -314,13 +316,13 @@ public class LexerTest {
                 "pobierzX",	"pobierzY",	"pobierzRotacje",	"idzLewo",	"idzPrawo",	"idzGora",	"idzDol",
                 "obrocPrawo",	"obrocLewo"};
 
-        for (int i = 0; i < functionNames.length; i++) {
-            Lexer lexer = new Lexer(new InputManager(functionNames[i]));
+        for (String functionName : functionNames) {
+            Lexer lexer = new Lexer(new InputManager(functionName));
 
             Token token = lexer.getNextToken();
 
             assertEquals(TokenType.FUNCTION, token.getTokenType());
-            assertEquals(functionNames[i], token.getStringValue());
+            assertEquals(functionName, token.getStringValue());
         }
     }
 
@@ -335,7 +337,7 @@ public class LexerTest {
 
     @Test
     public void shouldCorrectlyParseAllTokens() {
-        String value = "idzLewo(50); //Idę w lewo 50 pikseli \n" +
+        String value = "idzLewo(50); #Idę w lewo 50 pikseli \n" +
                 "jezeli (a == 4) { c = \"kwiat\"; }\n";
         Lexer lexer = new Lexer(new InputManager(value));
 
