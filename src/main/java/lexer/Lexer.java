@@ -6,28 +6,20 @@ import token.TokenType;
 import input.InputManager;
 
 public class Lexer {
-    private InputManager inputManager;
+    private InputManager source;
 
     public Lexer(InputManager inputManager) {
-        this.inputManager = inputManager;
+        this.source = inputManager;
     }
 
-    private char getNextChar() {
-        return inputManager.getNextChar();
-    }
-
-    private char peek() {
-        return inputManager.peek();
-    }
-
-    private boolean isEoF() { return inputManager.isEoF(); }
+    private boolean isEoF() { return source.isEoF(); }
 
     public Token getNextToken() {
-        char nextChar = getNextChar();
+        source.next();
 
         //delete white spaces
-        while (Character.isWhitespace(nextChar)) {
-            nextChar = getNextChar();
+        while (Character.isWhitespace(source.getCurrentChar())) {
+            source.next();
         }
 
         if (isEoF()) {
@@ -35,93 +27,95 @@ public class Lexer {
         }
 
         //delete comments
-        if (nextChar == '#') {
-            int lineNumber = inputManager.getLineNumber();
+        if (source.getCurrentChar() == '#') {
+            int lineNumber = source.getLineNumber();
 
-            while((lineNumber == inputManager.getLineNumber() || Character.isWhitespace(nextChar)) && !isEoF()) {
-                nextChar = getNextChar();
+            while((lineNumber == source.getLineNumber() || Character.isWhitespace(source.getCurrentChar())) && !isEoF()) {
+                source.next();
             }
         }
 
-        if (Character.isDigit(nextChar))
-            return processInteger(nextChar);
-        if (nextChar == '"') {
-            return processString(nextChar);
+        if (Character.isDigit(source.getCurrentChar()))
+            return processInteger();
+        if (source.getCurrentChar() == '"') {
+            return processString();
         }
-        if (Character.isLetter(nextChar)) {
-            return processKeywordOrId(nextChar);
+        if (Character.isLetter(source.getCurrentChar())) {
+            return processKeywordOrId();
         }
         else {
-            return processOperator(nextChar);
+            return processOperator();
         }
     }
 
-    private Token processInteger(char nextChar) {
-        if (nextChar == '0')
+    private Token processInteger() {
+        if (source.getCurrentChar() == '0')
             return new Token(TokenType.ERROR);
 
-        int number = nextChar-'0';
+        int number = source.getCurrentChar()-'0';
 
-        while (Character.isDigit(peek()) && !isEoF()) {
-            int digit = getNextChar() - '0';
+        while (Character.isDigit(source.getNextChar()) && !isEoF()) {
+            source.next();
+            int digit = source.getCurrentChar() - '0';
             number = number*10 + digit;
         }
 
         return new Token(TokenType.INTEGER, number);
     }
 
-    private Token processString(char nextChar) {
+    private Token processString() {
         StringBuilder builder = new StringBuilder();
 
-        while (peek() != '"' && !isEoF()) {
-            builder.append(getNextChar());
+        while (source.getNextChar() != '"' && !isEoF()) {
+            source.next();
+            builder.append(source.getCurrentChar());
         }
 
-        getNextChar();
+        source.next();
 
         return new Token(TokenType.STRING, builder.toString());
     }
 
-    private Token processOperator(char nextChar) {
-        switch (nextChar) {
+    private Token processOperator() {
+        switch (source.getCurrentChar()) {
             case '=':
-                if (peek() == '=') {
-                    getNextChar();
+                if (source.getNextChar() == '=') {
+                    source.next();
                     return new Token(TokenType.EQUAL);
                 }
                 return new Token(TokenType.ASSIGNMENT);
 
             case '&':
-                if (peek() == '&') {
-                    getNextChar();
+                if (source.getNextChar() == '&') {
+                    source.next();
                     return new Token(TokenType.AND);
                 }
                 return new Token(TokenType.ERROR);
 
             case '|':
-                if (peek() == '|') {
-                    getNextChar();
+                if (source.getNextChar() == '|') {
+                    source.next();
                     return new Token(TokenType.OR);
                 }
                 return new Token(TokenType.ERROR);
 
             case '!':
-                if (peek() == '=') {
-                    getNextChar();
+                if (source.getNextChar() == '=') {
+                    source.next();
                     return new Token(TokenType.NOT_EQUAL);
                 }
                 return new Token(TokenType.NEGATION);
 
             case '>':
-                if (peek() == '=') {
-                    getNextChar();
+                if (source.getNextChar() == '=') {
+                    source.next();
                     return new Token(TokenType.GREATER_EQUAL);
                 }
                 return new Token(TokenType.GREATER);
 
             case '<':
-                if (peek() == '=') {
-                    getNextChar();
+                if (source.getNextChar() == '=') {
+                    source.next();
                     return new Token(TokenType.LESS_EQUAL);
                 }
                 return new Token(TokenType.LESS);
@@ -160,12 +154,13 @@ public class Lexer {
         return new Token(TokenType.ERROR);
     }
 
-    private Token processKeywordOrId(char nextChar) {
+    private Token processKeywordOrId() {
         StringBuilder builder = new StringBuilder();
-        builder.append(nextChar);
+        builder.append(source.getCurrentChar());
 
-        while((Character.isLetter(peek()) || Character.isDigit(peek())) && !isEoF()) {
-            builder.append(getNextChar());
+        while((Character.isLetter(source.getNextChar()) || Character.isDigit(source.getNextChar())) && !isEoF()) {
+            source.next();
+            builder.append(source.getCurrentChar());
         }
 
         String string = builder.toString();

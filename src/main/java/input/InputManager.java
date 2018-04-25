@@ -12,12 +12,22 @@ public class InputManager {
     private int lineNumber = 1;
 
     private char currentChar;
+    private char nextChar;
 
     public InputManager(String string) {
          inputStream = new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8));
+         next();
+    }
+
+    public char getCurrentChar() {
+        return currentChar;
     }
 
     public char getNextChar() {
+        return nextChar;
+    }
+
+    public void next() {
         char character='d';
 
         try {
@@ -33,29 +43,8 @@ public class InputManager {
         catch (IOException e) {
         }
 
-        currentChar = character;
-
-        return character;
-    }
-
-    public char peek() {
-        try {
-            inputStream.mark(1);
-
-            char character = (char) inputStream.read();
-
-            while(character == '\n') {
-                inputStream.mark(1);
-
-                character = (char) inputStream.read();
-            }
-
-            inputStream.reset();
-
-            return character;
-        } catch (IOException e) {
-            return 'a';
-        }
+        currentChar = nextChar;
+        nextChar = character;
     }
 
     public int getPositionInLine() {
