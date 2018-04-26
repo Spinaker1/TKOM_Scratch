@@ -17,22 +17,10 @@ public class Lexer {
     public Token getNextToken() {
         source.next();
 
-        //delete white spaces
-        while (Character.isWhitespace(source.getCurrentChar())) {
-            source.next();
-        }
+        while (deleteComments() || deleteWhitespaces());
 
         if (isEoF()) {
             return new Token(TokenType.EOF);
-        }
-
-        //delete comments
-        if (source.getCurrentChar() == '#') {
-            int lineNumber = source.getLineNumber();
-
-            while((lineNumber == source.getLineNumber() || Character.isWhitespace(source.getCurrentChar())) && !isEoF()) {
-                source.next();
-            }
         }
 
         if (Character.isDigit(source.getCurrentChar()))
@@ -68,6 +56,11 @@ public class Lexer {
 
         while (source.getNextChar() != '"' && !isEoF()) {
             source.next();
+
+            if (source.getCurrentChar() == '\\' && source.getNextChar() == '"') {
+                source.next();
+            }
+
             builder.append(source.getCurrentChar());
         }
 
@@ -178,5 +171,32 @@ public class Lexer {
             return token;
 
         return new Token(TokenType.VARIABLE,string);
+    }
+
+    private boolean deleteComments() {
+        boolean isComment = false;
+
+        if (source.getCurrentChar() == '#') {
+            isComment = true;
+
+            int lineNumber = source.getLineNumber();
+
+            do {
+                source.next();
+            } while (lineNumber == source.getLineNumber()  && !isEoF());
+        }
+
+        return isComment;
+    }
+
+    private boolean deleteWhitespaces() {
+        boolean isWhitespace = false;
+
+        if (Character.isWhitespace(source.getCurrentChar())) {
+            source.next();
+            isWhitespace = true;
+        }
+
+        return isWhitespace;
     }
 }

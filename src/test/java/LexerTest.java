@@ -223,6 +223,17 @@ public class LexerTest {
     }
 
     @Test
+    public void shouldEscapeQutationMarkInString() {
+        String value = "\"a\\\"bc\\\"\"";
+        Lexer lexer = new Lexer(new InputManager(value));
+
+        Token token = lexer.getNextToken();
+
+        assertEquals(TokenType.STRING, token.getTokenType());
+        assertEquals("a\"bc\"", token.getStringValue());
+    }
+
+    @Test
     public void shouldParseVariable() {
         String value = "kangurek1";
         Lexer lexer = new Lexer(new InputManager(value));
@@ -236,8 +247,8 @@ public class LexerTest {
     @Test
     public void shouldDeleteComments() {
         String value = (
-                "# komentarz\n" +
-                "69 #456 \n" +
+                " # komentarz  \n" +
+                "  69 #456 \n" +
                 " \"kwoka\"");
         Lexer lexer = new Lexer(new InputManager(value));
 
