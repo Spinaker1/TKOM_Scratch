@@ -38,7 +38,7 @@ public class Lexer {
 
     private Token processInteger() {
         if (source.getCurrentChar() == '0')
-            return new Token(TokenType.ERROR);
+            return new Token(TokenType.ERROR,"Liczba nie powinna zaczynać się od 0.");
 
         int number = source.getCurrentChar()-'0';
 
@@ -83,14 +83,14 @@ public class Lexer {
                     source.next();
                     return new Token(TokenType.AND);
                 }
-                return new Token(TokenType.ERROR);
+                return new Token(TokenType.ERROR, "Nieprawidłowe wyrażenie");
 
             case '|':
                 if (source.getNextChar() == '|') {
                     source.next();
                     return new Token(TokenType.OR);
                 }
-                return new Token(TokenType.ERROR);
+                return new Token(TokenType.ERROR, "Nieprawidłowe wyrażenie");
 
             case '!':
                 if (source.getNextChar() == '=') {
@@ -142,9 +142,12 @@ public class Lexer {
 
             case ')':
                 return new Token(TokenType.PARENTHESIS_CLOSE);
+
+            case ',':
+                return new Token(TokenType.COMMA);
         }
 
-        return new Token(TokenType.ERROR);
+        return new Token(TokenType.ERROR, "Nieprawidłowe wyrażenie.");
     }
 
     private Token processKeywordOrId() {

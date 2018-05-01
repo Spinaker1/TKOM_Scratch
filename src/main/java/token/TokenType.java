@@ -15,6 +15,7 @@ public enum TokenType {
     LESS_EQUAL,
     GREATER_EQUAL,
     SEMICOLON,
+    COMMA,
     PARENTHESIS_OPEN,
     PARENTHESIS_CLOSE,
     BRACKET_OPEN,

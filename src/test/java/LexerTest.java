@@ -1,4 +1,3 @@
-
 import input.InputManager;
 import org.junit.Test;
 import token.Token;
@@ -43,6 +42,15 @@ public class LexerTest {
         Token token = lexer.getNextToken();
 
         assertEquals(TokenType.DIVIDE, token.getTokenType());
+    }
+
+    @Test
+    public void shouldParseComma() {
+        Lexer lexer = new Lexer(new InputManager(","));
+
+        Token token = lexer.getNextToken();
+
+        assertEquals(TokenType.COMMA, token.getTokenType());
     }
 
     @Test
