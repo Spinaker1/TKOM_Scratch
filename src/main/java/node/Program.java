@@ -9,7 +9,7 @@ public class Program {
         events.add(event);
     }
 
-    public LinkedList<Event> getArguments() {
+    public LinkedList<Event> getEvents() {
         return events;
     }
 }
