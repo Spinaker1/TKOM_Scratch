@@ -1,7 +1,7 @@
 package node;
 
 public class IntLiteral extends Node {
-    int value;
+    private int value;
 
     public int getValue() {
         return value;

@@ -2,10 +2,7 @@ package parser;
 
 import lexer.Lexer;
 import node.*;
-import node.Event;
 import token.*;
-
-import java.awt.*;
 
 public class Parser {
     private Lexer lexer;
@@ -26,7 +23,7 @@ public class Parser {
         return program;
     }
 
-    public Token getToken() throws Exception {
+    private Token getToken() throws Exception {
         Token token = lexer.getNextToken();
 
         if (checkTokenType(token,TokenType.ERROR)) {
@@ -74,21 +71,26 @@ public class Parser {
             throw new Exception("Oczekiwane wyrażenie: )");
         }
 
-        parseBlock();
+        event.setCodeBlock(parseBlock());
 
         return event;
     }
 
-    public Assignment parseAssignment() throws Exception {
+    private Assignment parseAssignment() throws Exception {
         Assignment assignment = new Assignment();
 
         assignment.setVariable(parseVariable());
 
-        if (!checkTokenType(getToken(), TokenType.ASSIGNMENT))
+        if (!checkTokenType(getToken(), TokenType.ASSIGNMENT)) {
             throw new Exception("Oczekiwane wyrażenie: =");
+        }
 
         getToken();
         assignment.setValue(parseAssignable());
+
+        if (!checkTokenType(currentToken, TokenType.SEMICOLON)) {
+            throw new Exception("Oczekiwane wyrażenie: ;");
+        }
 
         return assignment;
     }
@@ -98,77 +100,112 @@ public class Parser {
             case FUNCTION:
                 return parseFunction();
 
+            case MINUS:
             case VARIABLE:
             case INTEGER:
                 return parseAdditiveExpression();
+
+            case STRING:
+                return parseStringLiteral();
 
                 default:
                     throw new Exception("");
         }
     }
 
-    private void parseRepeatStatement() throws Exception {
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
+    private RepeatStatement parseRepeatStatement() throws Exception {
+        RepeatStatement repeatStatement = new RepeatStatement();
+
+        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN)) {
             throw new Exception("Oczekiwane wyrażenie: (");
+        }
 
-        if (!checkTokenType(getToken(), TokenType.INTEGER))
+        if (!checkTokenType(getToken(), TokenType.INTEGER)) {
             throw new Exception("Oczekiwane wyrażenie: liczba całkowita");
+        }
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE))
+        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
             throw new Exception("Oczekiwane wyrażenie: )");
+        }
 
-        parseBlock();
+        repeatStatement.setCodeBlock(parseBlock());
+
+        return repeatStatement;
     }
 
-    private void parseIfStatement() throws Exception {
+    private IfStatement parseIfStatement() throws Exception {
         IfStatement ifStatement = new IfStatement();
 
         if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
             throw new Exception("Oczekiwane wyrażenie: (");
 
-        parseCondition();
+        ifStatement.setCondition(parseCondition());
 
         if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE))
             throw new Exception("Oczekiwane wyrażenie: )");
 
-        parseBlock();
+        ifStatement.setCodeBlock(parseBlock());
 
         if (checkTokenType(currentToken, TokenType.ELSE)) {
             ifStatement.setElse(true);
-            parseBlock();
+            ifStatement.setElseCodeBlock(parseBlock());
         }
+
+        return ifStatement;
     }
 
-    public void parseBlock() throws Exception {
+    private RepeatIfStatement parseRepeatIfStatement() throws Exception {
+        RepeatIfStatement repeatIfStatement = new RepeatIfStatement();
+
+        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
+            throw new Exception("Oczekiwane wyrażenie: (");
+
+        repeatIfStatement.setCondition(parseCondition());
+
+        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE))
+            throw new Exception("Oczekiwane wyrażenie: )");
+
+        repeatIfStatement.setCodeBlock(parseBlock());
+
+        return repeatIfStatement;
+    }
+
+    private Block parseBlock() throws Exception {
+        Block block = new Block();
+
         if (!checkTokenType(getToken(), TokenType.BRACKET_OPEN))
             throw new Exception("Oczekiwane wyrażenie: {");
 
         while (!checkTokenType(getToken(), TokenType.BRACKET_CLOSE)) {
             switch (currentToken.getTokenType()) {
                 case IF:
-                    parseIfStatement();
+                    block.addInstruction(parseIfStatement());
                     break;
 
                 case REPEAT:
-                    parseRepeatStatement();
+                    block.addInstruction(parseRepeatStatement());
                     break;
 
                 case FUNCTION:
-                    parseFunction();
+                    block.addInstruction(parseFunction());
                     break;
 
                 case VARIABLE:
-                    parseAssignment();
+                    block.addInstruction(parseAssignment());
                     break;
 
                     default:
                         throw new Exception("Oczekiwane wyrażenie: }");
             }
         }
+
+        return block;
     }
 
-    private void parseCondition() {
+    private Condition parseCondition() {
+        Condition condition = new Condition();
 
+        return condition;
     }
 
     private Function parseFunction() throws Exception {
@@ -198,6 +235,10 @@ public class Parser {
                             throw new Exception("Nieprawidłowe wyrażenie");
                 }
             }
+        }
+
+        if (!checkTokenType(getToken(),TokenType.SEMICOLON)) {
+            throw new Exception("Oczekiwanie wyrażenie: ;");
         }
 
         return function;
@@ -265,6 +306,16 @@ public class Parser {
         intLiteral.setValue(value);
 
         return intLiteral;
+    }
+
+    private StringLiteral parseStringLiteral() throws Exception {
+        StringLiteral stringLiteral = new StringLiteral();
+
+        stringLiteral.setValue(currentToken.getStringValue());
+
+        getToken();
+
+        return stringLiteral;
     }
 
     private Variable parseVariable() {
