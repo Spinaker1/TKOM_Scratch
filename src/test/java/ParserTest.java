@@ -213,4 +213,53 @@ public class ParserTest {
             fail();
         }
     }
+
+    @Test
+    public void ShouldParseIfStatementWithAndOperator() {
+        try {
+            StringBuilder builder = new StringBuilder(" START() { jezeli (4 == y+1 || w < 5) {}  }");
+            Parser parser = new Parser(new Lexer(new InputManager(builder.toString())));
+
+            Program program = parser.parse();
+            Event event = program.getEvents().get(0);
+            Block block = event.getCodeBlock();
+            IfStatement ifStatement = (IfStatement) block.getInstructions().get(0);
+            Condition orCond = ifStatement.getCondition();
+            Condition andCond = (Condition) orCond.getOperands().get(0);
+            Condition relCond = (Condition) andCond.getOperands().get(0);
+            Condition priCond = (Condition) relCond.getOperands().get(0);
+            Expression addExpr = (Expression) priCond.getOperands().get(0);
+            Expression mulExpr = (Expression) addExpr.getOperands().get(0);
+            IntLiteral int1 = (IntLiteral) mulExpr.getOperands().get(0);
+
+            Condition priCond2 = (Condition) relCond.getOperands().get(1);
+            Expression addExpr2 = (Expression) priCond2.getOperands().get(0);
+            Expression mulExpr2 = (Expression) addExpr2.getOperands().get(0);
+            Variable var1 = (Variable) mulExpr2.getOperands().get(0);
+
+            Expression mulExpr3 = (Expression) addExpr2.getOperands().get(1);
+            IntLiteral int2 = (IntLiteral) mulExpr3.getOperands().get(0);
+
+            Condition andCond1 = (Condition) orCond.getOperands().get(1);
+            Condition relCond2 = (Condition) andCond1.getOperands().get(0);
+            Condition priCond3 = (Condition) relCond2.getOperands().get(0);
+            Expression addExpr3 = (Expression) priCond3.getOperands().get(0);
+            Expression mulExpr4 = (Expression) addExpr3.getOperands().get(0);
+            Variable var2 = (Variable) mulExpr4.getOperands().get(0);
+
+            Condition priCond4 = (Condition) relCond2.getOperands().get(1);
+            Expression addExpr4 = (Expression) priCond4.getOperands().get(0);
+            Expression mulExpr5 = (Expression) addExpr4.getOperands().get(0);
+            IntLiteral int3 = (IntLiteral) mulExpr5.getOperands().get(0);
+
+            assertEquals(4, int1.getValue());
+            assertEquals("y", var1.getName());
+            assertEquals(1, int2.getValue());
+            assertEquals("w", var2.getName());
+            assertEquals(5, int3.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 }

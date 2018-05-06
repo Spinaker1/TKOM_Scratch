@@ -76,6 +76,78 @@ public class Parser {
         return event;
     }
 
+    private Block parseBlock() throws Exception {
+        Block block = new Block();
+
+        if (!checkTokenType(getToken(), TokenType.BRACKET_OPEN))
+            throw new Exception("Oczekiwane wyrażenie: {");
+
+        while (!checkTokenType(getToken(), TokenType.BRACKET_CLOSE)) {
+            switch (currentToken.getTokenType()) {
+                case IF:
+                    block.addInstruction(parseIfStatement());
+                    break;
+
+                case REPEAT:
+                    block.addInstruction(parseRepeatStatement());
+                    break;
+
+                case REPEAT_IF:
+                    block.addInstruction(parseRepeatIfStatement());
+                    break;
+
+                case FUNCTION:
+                    block.addInstruction(parseFunction());
+                    break;
+
+                case VARIABLE:
+                    block.addInstruction(parseAssignment());
+                    break;
+
+                default:
+                    throw new Exception("Oczekiwane wyrażenie: }");
+            }
+        }
+
+        return block;
+    }
+
+    private Function parseFunction() throws Exception {
+        Function function = new Function();
+
+        function.setName(currentToken.getStringValue());
+
+        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
+            throw new Exception("Oczekiwane wyrażenie: (");
+
+        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
+
+            loop:
+            while (true) {
+                Node node = parseAssignable();
+                function.addArgument(node);
+
+                switch (currentToken.getTokenType()) {
+                    case PARENTHESIS_CLOSE:
+                        break loop;
+
+                    case COMMA:
+                        getToken();
+                        continue loop;
+
+                    default:
+                        throw new Exception("Nieprawidłowe wyrażenie");
+                }
+            }
+        }
+
+        if (!checkTokenType(getToken(),TokenType.SEMICOLON)) {
+            throw new Exception("Oczekiwanie wyrażenie: ;");
+        }
+
+        return function;
+    }
+
     private Assignment parseAssignment() throws Exception {
         Assignment assignment = new Assignment();
 
@@ -172,38 +244,6 @@ public class Parser {
         return repeatIfStatement;
     }
 
-    private Block parseBlock() throws Exception {
-        Block block = new Block();
-
-        if (!checkTokenType(getToken(), TokenType.BRACKET_OPEN))
-            throw new Exception("Oczekiwane wyrażenie: {");
-
-        while (!checkTokenType(getToken(), TokenType.BRACKET_CLOSE)) {
-            switch (currentToken.getTokenType()) {
-                case IF:
-                    block.addInstruction(parseIfStatement());
-                    break;
-
-                case REPEAT:
-                    block.addInstruction(parseRepeatStatement());
-                    break;
-
-                case FUNCTION:
-                    block.addInstruction(parseFunction());
-                    break;
-
-                case VARIABLE:
-                    block.addInstruction(parseAssignment());
-                    break;
-
-                    default:
-                        throw new Exception("Oczekiwane wyrażenie: }");
-            }
-        }
-
-        return block;
-    }
-
     private Condition parseCondition() throws Exception {
         Condition condition = new Condition();
 
@@ -220,17 +260,17 @@ public class Parser {
     private Condition parseAndCondition() throws Exception {
         Condition condition = new Condition();
 
-        condition.addOperand(parseEqualityCondition());
+        condition.addOperand(parseRelationalCondition());
         while (checkTokenType(currentToken,TokenType.AND )) {
             condition.addOperator(currentToken.getTokenType());
             getToken();
-            condition.addOperand(parseEqualityCondition());
+            condition.addOperand(parseRelationalCondition());
         }
 
         return condition;
     }
 
-    private Condition parseEqualityCondition() throws Exception {
+    private Condition parseRelationalCondition() throws Exception {
         Condition condition = new Condition();
 
         condition.addOperand(parsePrimaryCondition());
@@ -261,40 +301,18 @@ public class Parser {
         return condition;
     }
 
-    private Function parseFunction() throws Exception {
-        Function function = new Function();
+    private Node parseAdditiveExpression() throws Exception {
+        Expression expression = new Expression();
 
-        function.setName(currentToken.getStringValue());
-
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
-            throw new Exception("Oczekiwane wyrażenie: (");
-
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
-
-            loop:
-            while (true) {
-                Node node = parseAssignable();
-                function.addArgument(node);
-
-                switch (currentToken.getTokenType()) {
-                    case PARENTHESIS_CLOSE:
-                        break loop;
-
-                    case COMMA:
-                        getToken();
-                        continue loop;
-
-                        default:
-                            throw new Exception("Nieprawidłowe wyrażenie");
-                }
-            }
+        expression.addOperand(parseMultiplicativeExpression());
+        while (checkTokenType(currentToken, TokenType.ADD) ||
+                checkTokenType(currentToken, TokenType.MINUS) ) {
+            expression.addOperator(currentToken.getTokenType());
+            getToken();
+            expression.addOperand(parseMultiplicativeExpression());
         }
 
-        if (!checkTokenType(getToken(),TokenType.SEMICOLON)) {
-            throw new Exception("Oczekiwanie wyrażenie: ;");
-        }
-
-        return function;
+        return expression;
     }
 
     private Expression parseMultiplicativeExpression() throws Exception {
@@ -306,20 +324,6 @@ public class Parser {
             expression.addOperator(currentToken.getTokenType());
             getToken();
             expression.addOperand(parsePrimaryExpression());
-        }
-
-        return expression;
-    }
-
-    private Node parseAdditiveExpression() throws Exception {
-        Expression expression = new Expression();
-
-        expression.addOperand(parseMultiplicativeExpression());
-        while (checkTokenType(currentToken, TokenType.ADD) ||
-                checkTokenType(currentToken, TokenType.MINUS) ) {
-            expression.addOperator(currentToken.getTokenType());
-            getToken();
-            expression.addOperand(parseMultiplicativeExpression());
         }
 
         return expression;
