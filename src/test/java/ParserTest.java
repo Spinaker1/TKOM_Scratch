@@ -53,11 +53,12 @@ public class ParserTest {
         }
     }
 
+
     @Test
     public void shouldParseIfStatementAndFunction() {
         try {
             Parser parser = new Parser(new Lexer(new InputManager("KOLIZJA(auto) { " +
-                    "jezeli() { " +
+                    "jezeli(1+2*3 != 5 && 3 < 5 || y+2+3 > k*s) { " +
                     "idzLewo(10); " +
                     "} " +
                     "}")));
@@ -79,6 +80,7 @@ public class ParserTest {
             fail();
         }
     }
+
 
     @Test
     public void shouldAssignVariable() {
@@ -173,6 +175,39 @@ public class ParserTest {
             assertEquals(4, intLiteral.getValue());
             assertEquals(TokenType.MULTIPLY, operation);
             assertEquals("y", var2.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldAssignExpressionInParentheses() {
+        try {
+            StringBuilder builder = new StringBuilder(" START() { x = (z+5)*y; }");
+            Parser parser = new Parser(new Lexer(new InputManager(builder.toString())));
+
+            Program program = parser.parse();
+            Event event = program.getEvents().get(0);
+            Block block = event.getCodeBlock();
+            Assignment assignment = (Assignment) block.getInstructions().get(0);
+            Variable var1 = assignment.getVariable();
+
+            Expression expression1 = (Expression) assignment.getValue();
+            Expression expression2 = (Expression) expression1.getOperands().get(0);
+
+            Expression expression3 = (Expression) expression2.getOperands().get(0);
+            Expression expression4 = (Expression) expression3.getOperands().get(0);
+            Variable var2 = (Variable) expression4.getOperands().get(0);
+            Expression expression5 = (Expression) expression3.getOperands().get(1);
+            IntLiteral intLiteral = (IntLiteral) expression5.getOperands().get(0);
+
+            Variable var3 = (Variable) expression2.getOperands().get(1);
+
+            assertEquals("x", var1.getName());
+            assertEquals("z", var2.getName());
+            assertEquals(5, intLiteral.getValue());
+            assertEquals("y", var3.getName());
         } catch (Exception e) {
             e.printStackTrace();
             fail();

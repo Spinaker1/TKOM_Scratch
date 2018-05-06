@@ -103,6 +103,7 @@ public class Parser {
             case MINUS:
             case VARIABLE:
             case INTEGER:
+            case PARENTHESIS_OPEN:
                 return parseAdditiveExpression();
 
             case STRING:
@@ -139,9 +140,10 @@ public class Parser {
         if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
             throw new Exception("Oczekiwane wyrażenie: (");
 
+        getToken();
         ifStatement.setCondition(parseCondition());
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE))
+        if (!checkTokenType(currentToken, TokenType.PARENTHESIS_CLOSE))
             throw new Exception("Oczekiwane wyrażenie: )");
 
         ifStatement.setCodeBlock(parseBlock());
@@ -162,7 +164,7 @@ public class Parser {
 
         repeatIfStatement.setCondition(parseCondition());
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE))
+        if (!checkTokenType(currentToken, TokenType.PARENTHESIS_CLOSE))
             throw new Exception("Oczekiwane wyrażenie: )");
 
         repeatIfStatement.setCodeBlock(parseBlock());
@@ -202,8 +204,59 @@ public class Parser {
         return block;
     }
 
-    private Condition parseCondition() {
+    private Condition parseCondition() throws Exception {
         Condition condition = new Condition();
+
+        condition.addOperand(parseAndCondition());
+        while (checkTokenType(currentToken,TokenType.OR )) {
+            condition.addOperator(currentToken.getTokenType());
+            getToken();
+            condition.addOperand(parseAndCondition());
+        }
+
+        return condition;
+    }
+
+    private Condition parseAndCondition() throws Exception {
+        Condition condition = new Condition();
+
+        condition.addOperand(parseEqualityCondition());
+        while (checkTokenType(currentToken,TokenType.AND )) {
+            condition.addOperator(currentToken.getTokenType());
+            getToken();
+            condition.addOperand(parseEqualityCondition());
+        }
+
+        return condition;
+    }
+
+    private Condition parseEqualityCondition() throws Exception {
+        Condition condition = new Condition();
+
+        condition.addOperand(parsePrimaryCondition());
+        if (checkTokenType(currentToken,TokenType.EQUAL) ||
+                checkTokenType(currentToken, TokenType.NOT_EQUAL) ||
+                checkTokenType(currentToken, TokenType.LESS) ||
+                checkTokenType(currentToken, TokenType.LESS_EQUAL) ||
+                checkTokenType(currentToken, TokenType.GREATER) ||
+                checkTokenType(currentToken, TokenType.GREATER_EQUAL)
+                ) {
+            condition.addOperator(currentToken.getTokenType());
+            getToken();
+            condition.addOperand(parsePrimaryCondition());
+        }
+
+        else {
+            throw new Exception();
+        }
+
+        return condition;
+    }
+
+    private Condition parsePrimaryCondition() throws Exception {
+        Condition condition = new Condition();
+
+        condition.addOperand(parseAdditiveExpression());
 
         return condition;
     }
@@ -248,7 +301,7 @@ public class Parser {
         Expression expression = new Expression();
 
         expression.addOperand(parsePrimaryExpression());
-        while (checkTokenType(getToken(), TokenType.MULTIPLY) ||
+        while (checkTokenType(currentToken, TokenType.MULTIPLY) ||
                 checkTokenType(currentToken, TokenType.DIVIDE) ) {
             expression.addOperator(currentToken.getTokenType());
             getToken();
@@ -284,9 +337,21 @@ public class Parser {
                 expression = parseFunction();
                 break;
 
-                default:
+            case MINUS:
+            case INTEGER:
                     expression = parseIntLiteral();
+                    break;
+
+            case PARENTHESIS_OPEN:
+                getToken();
+
+                expression = parseAdditiveExpression();
+                if (!checkTokenType(currentToken,TokenType.PARENTHESIS_CLOSE))
+                    throw new Exception();
         }
+
+        getToken();
+
         return expression;
     }
 

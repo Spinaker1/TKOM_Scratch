@@ -9,7 +9,7 @@ import parser.Parser;
 public class Main {
     public static void main(String Args[]) {
         try {
-            InputManager inputManager = new InputManager("START() { x = 1 ; }");
+            InputManager inputManager = new InputManager("START() { x = (4+2) * 5;  }");
             Lexer lexer = new Lexer(inputManager);
             Parser parser = new Parser(lexer);
             parser.parse();
