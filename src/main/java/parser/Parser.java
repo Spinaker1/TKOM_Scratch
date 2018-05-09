@@ -28,13 +28,6 @@ public class Parser {
     private Token getToken() throws Exception {
         Token token = lexer.getNextToken();
 
-        if (checkTokenType(token,TokenType.ERROR)) {
-            if (token.getStringValue() != null)
-                throw new Exception(token.getStringValue());
-            else
-                throw new Exception();
-        }
-
         currentToken = token;
 
         return token;
@@ -55,7 +48,7 @@ public class Parser {
             return null;
         }
 
-        String name = currentToken.getStringValue();
+        EventType eventType = currentToken.getEventType();
 
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
@@ -72,7 +65,7 @@ public class Parser {
         if ((codeBlock = parseBlock()) == null)
             throw new Exception();
 
-        return new Event(name, argument, codeBlock);
+        return new Event(eventType, argument, codeBlock);
     }
 
     private Block parseBlock() throws Exception {
@@ -80,7 +73,7 @@ public class Parser {
             return null;
 
         LinkedList<Node> instructions = new LinkedList<>();
-        Node instruction = null;
+        Node instruction;
         getToken();
         while((instruction = parseInstruction()) != null ||
                 (instruction = parseIfStatement()) != null ||
@@ -96,7 +89,7 @@ public class Parser {
     }
 
     private Node parseInstruction() throws Exception {
-        Node instruction = null;
+        Node instruction;
 
         if ((instruction = parseAssignment()) != null) {
             accept(currentToken, TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
@@ -113,7 +106,7 @@ public class Parser {
             return null;
         }
 
-        String name = currentToken.getStringValue();
+        FunctionType functionType = currentToken.getFunctionType();
 
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
@@ -140,7 +133,7 @@ public class Parser {
             }
         }
 
-        return new Function(name, arguments);
+        return new Function(functionType, arguments);
     }
 
     private Assignment parseAssignment() throws Exception {
@@ -159,7 +152,7 @@ public class Parser {
     }
 
     private Assignable parseAssignable() throws Exception {
-        Assignable assignable = null;
+        Assignable assignable;
         if ((assignable = parseStringLiteral()) == null) {
             assignable = parseAdditiveExpression();
         }

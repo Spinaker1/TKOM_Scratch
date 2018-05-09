@@ -1,21 +1,23 @@
 package node;
 
+import token.FunctionType;
+
 import java.util.LinkedList;
 
 public class Function extends Operand {
-    private String name;
-    private LinkedList<Assignable> arguments = new LinkedList<>();
+    private FunctionType functionType;
+    private LinkedList<Assignable> arguments;
 
-    public Function(String name, LinkedList<Assignable> arguments) {
-        this.name = name;
+    public Function(FunctionType functionType, LinkedList<Assignable> arguments) {
+        this.functionType = functionType;
         this.arguments = arguments;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public LinkedList<Assignable> getArguments() {
         return arguments;
+    }
+
+    public FunctionType getFunctionType() {
+        return functionType;
     }
 }

@@ -14,13 +14,13 @@ public class Lexer {
 
     private boolean isEoF() { return source.isEoF(); }
 
-    public Token getNextToken() {
+    public Token getNextToken() throws Exception {
         source.next();
 
         while (deleteComments() || deleteWhitespaces());
 
         if (isEoF()) {
-            return new Token(TokenType.EOF);
+            return new Token(TokenType.EOF, source);
         }
 
         if (Character.isDigit(source.getCurrentChar()))
@@ -36,9 +36,9 @@ public class Lexer {
         }
     }
 
-    private Token processInteger() {
+    private Token processInteger() throws Exception {
         if (source.getCurrentChar() == '0')
-            return new Token(TokenType.ERROR,"Liczba nie powinna zaczynać się od 0.");
+            throw new Exception("Liczba nie powinna zaczynać się od 0.");
 
         int number = source.getCurrentChar()-'0';
 
@@ -48,7 +48,7 @@ public class Lexer {
             number = number*10 + digit;
         }
 
-        return new Token(TokenType.INTEGER, number);
+        return new Token(TokenType.INTEGER, number, source);
     }
 
     private Token processString() {
@@ -66,88 +66,88 @@ public class Lexer {
 
         source.next();
 
-        return new Token(TokenType.STRING, builder.toString());
+        return new Token(TokenType.STRING, builder.toString(), source);
     }
 
-    private Token processOperator() {
+    private Token processOperator() throws Exception {
         switch (source.getCurrentChar()) {
             case '=':
                 if (source.getNextChar() == '=') {
                     source.next();
-                    return new Token(TokenType.EQUAL);
+                    return new Token(TokenType.EQUAL, source);
                 }
-                return new Token(TokenType.ASSIGNMENT);
+                return new Token(TokenType.ASSIGNMENT, source);
 
             case '&':
                 if (source.getNextChar() == '&') {
                     source.next();
-                    return new Token(TokenType.AND);
+                    return new Token(TokenType.AND, source);
                 }
-                return new Token(TokenType.ERROR, "Nieprawidłowe wyrażenie");
+                throw new Exception("Nieprawidłowe wyrażenie");
 
             case '|':
                 if (source.getNextChar() == '|') {
                     source.next();
                     return new Token(TokenType.OR);
                 }
-                return new Token(TokenType.ERROR, "Nieprawidłowe wyrażenie");
+                throw new Exception("Nieprawidłowe wyrażenie");
 
             case '!':
                 if (source.getNextChar() == '=') {
                     source.next();
-                    return new Token(TokenType.NOT_EQUAL);
+                    return new Token(TokenType.NOT_EQUAL, source);
                 }
-                return new Token(TokenType.NEGATION);
+                return new Token(TokenType.NEGATION, source);
 
             case '>':
                 if (source.getNextChar() == '=') {
                     source.next();
-                    return new Token(TokenType.GREATER_EQUAL);
+                    return new Token(TokenType.GREATER_EQUAL, source);
                 }
-                return new Token(TokenType.GREATER);
+                return new Token(TokenType.GREATER, source);
 
             case '<':
                 if (source.getNextChar() == '=') {
                     source.next();
-                    return new Token(TokenType.LESS_EQUAL);
+                    return new Token(TokenType.LESS_EQUAL, source);
                 }
-                return new Token(TokenType.LESS);
+                return new Token(TokenType.LESS, source);
 
             case '+':
-                return new Token(TokenType.ADD);
+                return new Token(TokenType.ADD, source);
 
             case '-':
-                return new Token(TokenType.MINUS);
+                return new Token(TokenType.MINUS, source);
 
             case '*':
-                return new Token(TokenType.MULTIPLY);
+                return new Token(TokenType.MULTIPLY, source);
 
             case '/':
-                return new Token(TokenType.DIVIDE);
+                return new Token(TokenType.DIVIDE, source);
 
             case '%':
-                return new Token(TokenType.MODULO);
+                return new Token(TokenType.MODULO, source);
 
             case ';':
-                return new Token(TokenType.SEMICOLON);
+                return new Token(TokenType.SEMICOLON, source);
 
             case '{':
-                return new Token(TokenType.BRACKET_OPEN);
+                return new Token(TokenType.BRACKET_OPEN, source);
 
             case '}':
-                return new Token(TokenType.BRACKET_CLOSE);
+                return new Token(TokenType.BRACKET_CLOSE, source);
 
             case '(':
-                return new Token(TokenType.PARENTHESIS_OPEN);
+                return new Token(TokenType.PARENTHESIS_OPEN, source);
 
             case ')':
-                return new Token(TokenType.PARENTHESIS_CLOSE);
+                return new Token(TokenType.PARENTHESIS_CLOSE, source);
 
             case ',':
-                return new Token(TokenType.COMMA);
+                return new Token(TokenType.COMMA, source);
         }
 
-        return new Token(TokenType.ERROR, "Nieprawidłowe wyrażenie.");
+        throw new Exception("Nieprawidłowe wyrażenie");
     }
 
     private Token processKeywordOrId() {
@@ -162,18 +162,12 @@ public class Lexer {
         String string = builder.toString();
 
         Token token = KeywordsHashmap.KEYWORDS.get(string);
-        if (token != null)
+        if (token != null) {
+            token.setPosition(source);
             return token;
+        }
 
-        token = Events.get(string);
-        if (token != null)
-            return token;
-
-        token = Functions.get(string);
-        if (token != null)
-            return token;
-
-        return new Token(TokenType.VARIABLE,string);
+        return new Token(TokenType.VARIABLE,string,source);
     }
 
     private boolean deleteComments() {

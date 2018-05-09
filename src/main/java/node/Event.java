@@ -1,18 +1,20 @@
 package node;
 
+import token.EventType;
+
 public class Event extends Node {
-    private String name;
+    private EventType eventType;
     private String argument;
     private Block codeBlock;
 
-    public Event(String name, String argument, Block codeBlock) {
-        this.name = name;
+    public Event(EventType eventType, String argument, Block codeBlock) {
+        this.eventType = eventType;
         this.argument = argument;
         this.codeBlock = codeBlock;
     }
 
-    public String getName() {
-        return name;
+    public EventType getEventType() {
+        return eventType;
     }
 
     public String getArgument() {

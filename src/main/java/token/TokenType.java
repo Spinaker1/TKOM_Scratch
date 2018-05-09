@@ -31,6 +31,5 @@ public enum TokenType {
     VARIABLE,
     EVENT,
     FUNCTION,
-    ERROR,
     EOF
 }

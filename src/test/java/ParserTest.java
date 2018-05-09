@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import token.EventType;
+import token.FunctionType;
 import token.TokenType;
 
 public class ParserTest {
@@ -23,10 +25,10 @@ public class ParserTest {
 
             LinkedList<Event> events = program.getEvents();
 
-            assertEquals("MYSZ", events.get(0).getName());
-            assertEquals("START", events.get(1).getName());
-            assertEquals("SCIANA", events.get(2).getName());
-            assertEquals("KOLIZJA", events.get(3).getName());
+            assertEquals(EventType.MOUSE, events.get(0).getEventType());
+            assertEquals(EventType.START, events.get(1).getEventType());
+            assertEquals(EventType.WALL, events.get(2).getEventType());
+            assertEquals(EventType.COLLISION, events.get(3).getEventType());
             assertEquals("kangurek", events.get(3).getArgument());
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,7 +46,7 @@ public class ParserTest {
             Block block = event.getCodeBlock();
             Function function = (Function)block.getInstructions().get(0);
 
-            assertEquals("pobierzY", function.getName());
+            assertEquals(FunctionType.GET_Y, function.getFunctionType());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -63,7 +65,7 @@ public class ParserTest {
             Block block2 = repeatStatement.getCodeBlock();
             Function function = (Function)block2.getInstructions().get(0);
 
-            assertEquals("pobierzY", function.getName());
+            assertEquals(FunctionType.GET_Y, function.getFunctionType());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -90,7 +92,7 @@ public class ParserTest {
             Expression expression2 = (Expression) expression1.getOperands().get(0);
             IntLiteral intLiteral = (IntLiteral) expression2.getOperands().get(0);
 
-            assertEquals("idzLewo", function.getName());
+            assertEquals(FunctionType.GO_LEFT, function.getFunctionType());
             assertEquals(10, intLiteral.getValue());
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,7 +248,7 @@ public class ParserTest {
             Function function = (Function) expression2.getOperands().get(0);
 
             assertEquals("x", var1.getName());
-            assertEquals("pobierzX", function.getName());
+            assertEquals(FunctionType.GET_X, function.getFunctionType());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
