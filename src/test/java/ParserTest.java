@@ -35,6 +35,23 @@ public class ParserTest {
     }
 
     @Test
+    public void shouldParseFunction() {
+        try {
+            Parser parser = new Parser(new Lexer(new InputManager("MYSZ() { pobierzY(); }")));
+
+            Program program = parser.parse();
+            Event event = program.getEvents().get(0);
+            Block block = event.getCodeBlock();
+            Function function = (Function)block.getInstructions().get(0);
+
+            assertEquals("pobierzY", function.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
     public void shouldParseRepeatStatement() {
         try {
             Parser parser = new Parser(new Lexer(new InputManager("MYSZ() { powtorz(4) { pobierzY(); } }")));
@@ -229,6 +246,7 @@ public class ParserTest {
             Function function = (Function) expression2.getOperands().get(0);
 
             assertEquals("x", var1.getName());
+            assertEquals("pobierzX", function.getName());
         } catch (Exception e) {
             e.printStackTrace();
             fail();

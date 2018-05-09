@@ -9,14 +9,6 @@ public class Assignment extends Node {
         this.value = value;
     }
 
-    public void setVariable(Variable variable) {
-        this.variable = variable;
-    }
-
-    public void setValue(Node value) {
-        this.value = value;
-    }
-
     public Variable getVariable() {
         return variable;
     }

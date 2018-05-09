@@ -3,10 +3,10 @@ package node;
 import java.util.LinkedList;
 
 public class Block {
-    private LinkedList<Node> instructions = new LinkedList<>();
+    private LinkedList<Node> instructions;
 
-    public void addInstruction(final Node instruction) {
-        instructions.add(instruction);
+    public Block(LinkedList<Node> instructions) {
+        this.instructions = instructions;
     }
 
     public LinkedList<Node> getInstructions() {

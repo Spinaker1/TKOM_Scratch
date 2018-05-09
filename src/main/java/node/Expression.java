@@ -5,23 +5,20 @@ import token.TokenType;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-public class Expression extends Node {
-    private LinkedList<TokenType> operations = new LinkedList<>();
-    private LinkedList<Node> operands = new LinkedList<>();
+public class Expression extends Operand {
+    private LinkedList<TokenType> operators;
+    private LinkedList<Operand> operands;
 
-    public void addOperator(final TokenType operator) {
-        operations.add(operator);
+    public Expression(LinkedList<TokenType> operators, LinkedList<Operand> operands) {
+        this.operators = operators;
+        this.operands = operands;
     }
 
-    public void addOperand(final Node operand) {
-        operands.add(operand);
-    }
-
-    public LinkedList<Node> getOperands() {
+    public LinkedList<Operand> getOperands() {
         return operands;
     }
 
     public LinkedList<TokenType> getOperations() {
-        return operations;
+        return operators;
     }
 }

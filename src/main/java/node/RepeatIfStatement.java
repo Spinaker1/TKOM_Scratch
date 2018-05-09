@@ -13,15 +13,7 @@ public class RepeatIfStatement extends Node {
         return codeBlock;
     }
 
-    public void setCodeBlock(Block codeBlock) {
-        this.codeBlock = codeBlock;
-    }
-
     public Condition getCondition() {
         return condition;
-    }
-
-    public void setCondition(Condition condition) {
-        this.condition = condition;
     }
 }

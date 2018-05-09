@@ -1,6 +1,6 @@
 package node;
 
-public class Variable extends Node {
+public class Variable extends Operand {
     private String name;
     private VariableType variableType;
     private String stringValue;
@@ -8,22 +8,6 @@ public class Variable extends Node {
 
     public Variable(String name) {
         this.name = name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setVariableType(VariableType variableType) {
-        this.variableType = variableType;
-    }
-
-    public void setStringValue(String stringValue) {
-        this.stringValue = stringValue;
-    }
-
-    public void setIntValue(int intValue) {
-        this.intValue = intValue;
     }
 
     public String getName() {

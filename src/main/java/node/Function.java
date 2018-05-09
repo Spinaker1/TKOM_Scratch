@@ -2,22 +2,20 @@ package node;
 
 import java.util.LinkedList;
 
-public class Function extends Node {
+public class Function extends Operand {
     private String name;
-    private LinkedList<Node> arguments = new LinkedList<>();
+    private LinkedList<Assignable> arguments = new LinkedList<>();
+
+    public Function(String name, LinkedList<Assignable> arguments) {
+        this.name = name;
+        this.arguments = arguments;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    public void addArgument(Node argument) {
-        arguments.add(argument);
-    }
-
-    public LinkedList<Node> getArguments() {
+    public LinkedList<Assignable> getArguments() {
         return arguments;
     }
 }

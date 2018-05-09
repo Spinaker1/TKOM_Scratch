@@ -13,15 +13,7 @@ public class RepeatStatement extends Node {
         return codeBlock;
     }
 
-    public void setCodeBlock(Block codeBlock) {
-        this.codeBlock = codeBlock;
-    }
-
     public int getRepeatingCount() {
         return repeatingCount;
-    }
-
-    public void setRepeatingCount(int repeatingCount) {
-        this.repeatingCount = repeatingCount;
     }
 }

@@ -28,8 +28,6 @@ public class Parser {
     private Token getToken() throws Exception {
         Token token = lexer.getNextToken();
 
-        System.out.println(token.getTokenType());
-
         if (checkTokenType(token,TokenType.ERROR)) {
             if (token.getStringValue() != null)
                 throw new Exception(token.getStringValue());
@@ -78,56 +76,55 @@ public class Parser {
     }
 
     private Block parseBlock() throws Exception {
-        Block block = new Block();
-
         if (!checkTokenType(getToken(), TokenType.BRACKET_OPEN))
             return null;
 
-        while (!checkTokenType(getToken(), TokenType.BRACKET_CLOSE)) {
-            switch (currentToken.getTokenType()) {
-                case IF:
-                    block.addInstruction(parseIfStatement());
-                    break;
-
-                case REPEAT:
-                    block.addInstruction(parseRepeatStatement());
-                    break;
-
-                case REPEAT_IF:
-                    block.addInstruction(parseRepeatIfStatement());
-                    break;
-
-                case FUNCTION:
-                    block.addInstruction(parseFunction());
-                    accept(getToken(), TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
-                    break;
-
-                case VARIABLE:
-                    block.addInstruction(parseAssignment());
-                    accept(currentToken, TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
-                    break;
-
-                default:
-                    throw new Exception("Oczekiwane wyrażenie: }");
-            }
+        LinkedList<Node> instructions = new LinkedList<>();
+        Node instruction = null;
+        getToken();
+        while((instruction = parseInstruction()) != null ||
+                (instruction = parseIfStatement()) != null ||
+                (instruction = parseRepeatIfStatement()) != null ||
+                (instruction = parseRepeatStatement()) != null) {
+           instructions.add(instruction);
+           getToken();
         }
 
-        return block;
+        accept(currentToken,TokenType.BRACKET_CLOSE,("Oczekiwane wyrażenie: }"));
+
+        return new Block(instructions);
+    }
+
+    private Node parseInstruction() throws Exception {
+        Node instruction = null;
+
+        if ((instruction = parseAssignment()) != null) {
+            accept(currentToken, TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
+        }
+        else if ((instruction = parseFunction()) != null) {
+            accept(getToken(), TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
+        }
+
+        return instruction;
     }
 
     private Function parseFunction() throws Exception {
-        Function function = new Function();
+        if (!checkTokenType(currentToken,TokenType.FUNCTION)) {
+            return null;
+        }
 
-        function.setName(currentToken.getStringValue());
+        String name = currentToken.getStringValue();
 
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
+
+        LinkedList<Assignable> arguments = new LinkedList<>();
 
         if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
 
             loop:
             while (true) {
-                Node node = parseAssignable();
-                function.addArgument(node);
+                Assignable argument = parseAssignable();
+                arguments.add(argument);
 
                 switch (currentToken.getTokenType()) {
                     case PARENTHESIS_CLOSE:
@@ -143,13 +140,17 @@ public class Parser {
             }
         }
 
-        return function;
+        return new Function(name, arguments);
     }
 
     private Assignment parseAssignment() throws Exception {
+        if (!checkTokenType(currentToken,TokenType.VARIABLE)) {
+            return null;
+        }
+
         Variable variable = parseVariable();
 
-        accept(getToken(), TokenType.ASSIGNMENT, "=");
+        accept(getToken(), TokenType.ASSIGNMENT, "Oczekiwane wyrażenie: =");
 
         getToken();
         Node assignable = parseAssignable();
@@ -157,38 +158,39 @@ public class Parser {
         return new Assignment(variable, assignable);
     }
 
-    private Node parseAssignable() throws Exception {
-        switch (currentToken.getTokenType()) {
-            case FUNCTION:
-            case MINUS:
-            case VARIABLE:
-            case INTEGER:
-            case PARENTHESIS_OPEN:
-                return parseAdditiveExpression();
-
-            case STRING:
-                return parseStringLiteral();
-
-                default:
-                    throw new Exception("");
+    private Assignable parseAssignable() throws Exception {
+        Assignable assignable = null;
+        if ((assignable = parseStringLiteral()) == null) {
+            assignable = parseAdditiveExpression();
         }
+
+        return assignable;
     }
 
     private RepeatStatement parseRepeatStatement() throws Exception {
+        if (!checkTokenType(currentToken,TokenType.REPEAT)) {
+            return null;
+        }
+
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         accept(getToken(), TokenType.INTEGER, "Oczekiwane wyrażenie: liczba całkowita");
-
         int repeatingCount = currentToken.getIntValue();
 
         accept(getToken(), TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
-        Block codeBlock = parseBlock();
+        Block codeBlock;
+        if ((codeBlock = parseBlock()) == null)
+            throw new Exception();
 
         return new RepeatStatement(codeBlock,repeatingCount);
     }
 
     private IfStatement parseIfStatement() throws Exception {
+        if (!checkTokenType(currentToken,TokenType.IF)) {
+            return null;
+        }
+
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         getToken();
@@ -196,58 +198,70 @@ public class Parser {
 
         accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
-        Block codeBlock = parseBlock();
+        Block codeBlock;
+        if ((codeBlock = parseBlock()) == null)
+            throw new Exception();
 
         Block elseCodeBlock = null;
         if (checkTokenType(currentToken, TokenType.ELSE)) {
-            elseCodeBlock = parseBlock();
+            if ((elseCodeBlock = parseBlock()) == null)
+                throw new Exception();
         }
 
         return new IfStatement(codeBlock, elseCodeBlock, condition);
     }
 
     private RepeatIfStatement parseRepeatIfStatement() throws Exception {
+        if (!checkTokenType(currentToken,TokenType.REPEAT_IF)) {
+            return null;
+        }
+
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         Condition condition = parseCondition();
 
         accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
-        Block codeBlock = parseBlock();
+        Block codeBlock;
+        if ((codeBlock = parseBlock()) == null)
+            throw new Exception();
 
         return new RepeatIfStatement(codeBlock, condition);
     }
 
     private Condition parseCondition() throws Exception {
-        Condition condition = new Condition();
+        LinkedList<Node> operands = new LinkedList<>();
+        LinkedList<TokenType> operators = new LinkedList<>();
 
-        condition.addOperand(parseAndCondition());
+        operands.add(parseAndCondition());
         while (checkTokenType(currentToken,TokenType.OR )) {
-            condition.addOperator(currentToken.getTokenType());
+            operators.add(currentToken.getTokenType());
             getToken();
-            condition.addOperand(parseAndCondition());
+            operands.add(parseAndCondition());
         }
 
-        return condition;
+        return new Condition(operators,operands);
     }
 
     private Condition parseAndCondition() throws Exception {
-        Condition condition = new Condition();
+        LinkedList<Node> operands = new LinkedList<>();
+        LinkedList<TokenType> operators = new LinkedList<>();
 
-        condition.addOperand(parseRelationalCondition());
+        operands.add(parseRelationalCondition());
         while (checkTokenType(currentToken,TokenType.AND )) {
-            condition.addOperator(currentToken.getTokenType());
+            operators.add(currentToken.getTokenType());
             getToken();
-            condition.addOperand(parseRelationalCondition());
+            operands.add(parseRelationalCondition());
         }
 
-        return condition;
+        return new Condition(operators,operands);
     }
 
     private Condition parseRelationalCondition() throws Exception {
-        Condition condition = new Condition();
+        LinkedList<Node> operands = new LinkedList<>();
+        LinkedList<TokenType> operators = new LinkedList<>();
 
-        condition.addOperand(parsePrimaryCondition());
+        operands.add(parsePrimaryCondition());
         if (checkTokenType(currentToken,TokenType.EQUAL) ||
                 checkTokenType(currentToken, TokenType.NOT_EQUAL) ||
                 checkTokenType(currentToken, TokenType.LESS) ||
@@ -255,87 +269,83 @@ public class Parser {
                 checkTokenType(currentToken, TokenType.GREATER) ||
                 checkTokenType(currentToken, TokenType.GREATER_EQUAL)
                 ) {
-            condition.addOperator(currentToken.getTokenType());
+            operators.add(currentToken.getTokenType());
             getToken();
-            condition.addOperand(parsePrimaryCondition());
+            operands.add(parsePrimaryCondition());
         }
-
         else {
             throw new Exception();
         }
 
-        return condition;
+        return new Condition(operators,operands);
     }
 
     private Condition parsePrimaryCondition() throws Exception {
-        Condition condition = new Condition();
+        LinkedList<Node> operands = new LinkedList<>();
+        LinkedList<TokenType> operators = new LinkedList<>();
 
-        condition.addOperand(parseAdditiveExpression());
+        operands.add(parseAdditiveExpression());
 
-        return condition;
+        return new Condition(operators,operands);
     }
 
-    private Node parseAdditiveExpression() throws Exception {
-        Expression expression = new Expression();
+    private Expression parseAdditiveExpression() throws Exception {
+        LinkedList<Operand> operands = new LinkedList<>();
+        LinkedList<TokenType> operators = new LinkedList<>();
 
-        expression.addOperand(parseMultiplicativeExpression());
+        operands.add(parseMultiplicativeExpression());
         while (checkTokenType(currentToken, TokenType.ADD) ||
                 checkTokenType(currentToken, TokenType.MINUS) ) {
-            expression.addOperator(currentToken.getTokenType());
+            operators.add(currentToken.getTokenType());
             getToken();
-            expression.addOperand(parseMultiplicativeExpression());
+            operands.add(parseMultiplicativeExpression());
         }
 
-        return expression;
+        return new Expression(operators, operands);
     }
 
     private Expression parseMultiplicativeExpression() throws Exception {
-        Expression expression = new Expression();
+        LinkedList<Operand> operands = new LinkedList<>();
+        LinkedList<TokenType> operators = new LinkedList<>();
 
-        expression.addOperand(parsePrimaryExpression());
-        while (checkTokenType(currentToken, TokenType.MULTIPLY) ||
+        operands.add(parsePrimaryExpression());
+        while (checkTokenType(getToken(), TokenType.MULTIPLY) ||
                 checkTokenType(currentToken, TokenType.DIVIDE) ) {
-            expression.addOperator(currentToken.getTokenType());
+            operators.add(currentToken.getTokenType());
             getToken();
-            expression.addOperand(parsePrimaryExpression());
+            operands.add(parsePrimaryExpression());
         }
 
-        return expression;
+        return new Expression(operators, operands);
     }
 
-    private Node parsePrimaryExpression() throws Exception {
-        Node expression = null;
-
+    private Operand parsePrimaryExpression() throws Exception {
         switch(currentToken.getTokenType()) {
             case VARIABLE:
-                expression = parseVariable();
-                break;
+                return parseVariable();
 
             case FUNCTION:
-                expression = parseFunction();
-                break;
+                return parseFunction();
 
             case MINUS:
             case INTEGER:
-                    expression = parseIntLiteral();
-                    break;
+                return parseIntLiteral();
 
             case PARENTHESIS_OPEN:
                 getToken();
 
-                expression = parseAdditiveExpression();
+                Operand expression = parseAdditiveExpression();
                 if (!checkTokenType(currentToken,TokenType.PARENTHESIS_CLOSE))
                     throw new Exception();
+
+                return expression;
+
+                default:
+                    return null;
         }
-
-        getToken();
-
-        return expression;
     }
 
     private IntLiteral parseIntLiteral() throws Exception {
-        IntLiteral intLiteral = new IntLiteral();
-
         boolean isNegative = false;
         if (checkTokenType(currentToken,TokenType.MINUS)) {
             isNegative = true;
@@ -346,19 +356,20 @@ public class Parser {
         if (isNegative) {
             value = -value;
         }
-        intLiteral.setValue(value);
 
-        return intLiteral;
+        return new IntLiteral(value);
     }
 
     private StringLiteral parseStringLiteral() throws Exception {
-        StringLiteral stringLiteral = new StringLiteral();
+        if (!checkTokenType(currentToken,TokenType.STRING)) {
+            return null;
+        }
 
-        stringLiteral.setValue(currentToken.getStringValue());
+        String value = currentToken.getStringValue();
 
         getToken();
 
-        return stringLiteral;
+        return new StringLiteral(value);
     }
 
     private Variable parseVariable() {
