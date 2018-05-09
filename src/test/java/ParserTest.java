@@ -81,7 +81,6 @@ public class ParserTest {
         }
     }
 
-
     @Test
     public void shouldAssignVariable() {
         try {
@@ -208,6 +207,28 @@ public class ParserTest {
             assertEquals("z", var2.getName());
             assertEquals(5, intLiteral.getValue());
             assertEquals("y", var3.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
+    public void shouldAssignFunction() {
+        try {
+            StringBuilder builder = new StringBuilder(" START() { x = pobierzX(); }");
+            Parser parser = new Parser(new Lexer(new InputManager(builder.toString())));
+
+            Program program = parser.parse();
+            Event event = program.getEvents().get(0);
+            Block block = event.getCodeBlock();
+            Assignment assignment = (Assignment) block.getInstructions().get(0);
+            Variable var1 = assignment.getVariable();
+            Expression expression1 = (Expression) assignment.getValue();
+            Expression expression2 = (Expression) expression1.getOperands().get(0);
+            Function function = (Function) expression2.getOperands().get(0);
+
+            assertEquals("x", var1.getName());
         } catch (Exception e) {
             e.printStackTrace();
             fail();

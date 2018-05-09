@@ -7,15 +7,18 @@ import java.nio.charset.StandardCharsets;
 
 public class InputManager {
     private InputStream inputStream;
+    private int fileLength;
 
     private int positionInLine = 0;
     private int lineNumber = 1;
+    private int positionInFile = 0;
 
     private char currentChar;
     private char nextChar;
 
     public InputManager(String string) {
          inputStream = new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8));
+         fileLength = string.length()+1;
          next();
     }
 
@@ -27,7 +30,10 @@ public class InputManager {
         return nextChar;
     }
 
+
     public void next() {
+        positionInFile++;
+
         char character='d';
 
         try {
@@ -55,7 +61,13 @@ public class InputManager {
         return lineNumber;
     }
 
+    public int getPositionInFile() {
+        return positionInFile;
+    }
+
     public boolean isEoF() {
+        if (positionInFile > fileLength)
+            return true;
         return (int) currentChar == -1;
     }
 }

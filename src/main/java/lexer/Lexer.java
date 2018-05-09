@@ -42,7 +42,7 @@ public class Lexer {
 
         int number = source.getCurrentChar()-'0';
 
-        while (Character.isDigit(source.getNextChar()) && !isEoF()) {
+        while (Character.isDigit(source.getNextChar())) {
             source.next();
             int digit = source.getCurrentChar() - '0';
             number = number*10 + digit;

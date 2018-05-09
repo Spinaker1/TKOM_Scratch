@@ -4,6 +4,11 @@ public class Assignment extends Node {
     private Variable variable;
     private Node value;
 
+    public Assignment(Variable variable, Node value) {
+        this.variable = variable;
+        this.value = value;
+    }
+
     public void setVariable(Variable variable) {
         this.variable = variable;
     }

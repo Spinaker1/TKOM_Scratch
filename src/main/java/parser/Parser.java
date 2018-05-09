@@ -4,6 +4,8 @@ import lexer.Lexer;
 import node.*;
 import token.*;
 
+import java.util.LinkedList;
+
 public class Parser {
     private Lexer lexer;
     private Token currentToken;
@@ -13,18 +15,20 @@ public class Parser {
     }
 
     public Program parse() throws Exception {
-        Program program = new Program();
+        LinkedList<Event> eventList = new LinkedList<>();
 
         Event event;
         while((event = parseEvent()) != null) {
-            program.addEvent(event);
+            eventList.add(event);
         }
 
-        return program;
+        return new Program(eventList);
     }
 
     private Token getToken() throws Exception {
         Token token = lexer.getNextToken();
+
+        System.out.println(token.getTokenType());
 
         if (checkTokenType(token,TokenType.ERROR)) {
             if (token.getStringValue() != null)
@@ -42,45 +46,42 @@ public class Parser {
         return tokenType.equals(token.getTokenType());
     }
 
-    private Event parseEvent() throws Exception {
-        Event event = new Event();
+    private void accept(Token token, TokenType tokenType, String exceptionText) throws Exception {
+        if (!checkTokenType(token, tokenType)) {
+            throw new Exception(exceptionText);
+        }
+    }
 
-        try {
-            getToken();
-        } catch (Exception e) {
+    private Event parseEvent() throws Exception {
+        if (!checkTokenType(getToken(), TokenType.EVENT)) {
             return null;
         }
 
-        if (!checkTokenType(currentToken, TokenType.EVENT)) {
-            throw new Exception("Oczekiwane wyrażenie: wydarzenie");
-        }
+        String name = currentToken.getStringValue();
 
-        event.setName(currentToken.getStringValue());
+        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN)) {
-            throw new Exception("Oczekiwane wyrażenie: (");
-        }
-
+        String argument = null;
         if (checkTokenType(getToken(), TokenType.VARIABLE)) {
-            event.setArgument(currentToken.getStringValue());
-            if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
-                throw new Exception("Oczekiwane wyrażenie: )");
-            }
+            argument = currentToken.getStringValue();
+            accept(getToken(), TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
         }
-        else if (!checkTokenType(currentToken, TokenType.PARENTHESIS_CLOSE)) {
-            throw new Exception("Oczekiwane wyrażenie: )");
+        else  {
+            accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
         }
 
-        event.setCodeBlock(parseBlock());
+        Block codeBlock;
+        if ((codeBlock = parseBlock()) == null)
+            throw new Exception();
 
-        return event;
+        return new Event(name, argument, codeBlock);
     }
 
     private Block parseBlock() throws Exception {
         Block block = new Block();
 
         if (!checkTokenType(getToken(), TokenType.BRACKET_OPEN))
-            throw new Exception("Oczekiwane wyrażenie: {");
+            return null;
 
         while (!checkTokenType(getToken(), TokenType.BRACKET_CLOSE)) {
             switch (currentToken.getTokenType()) {
@@ -98,10 +99,12 @@ public class Parser {
 
                 case FUNCTION:
                     block.addInstruction(parseFunction());
+                    accept(getToken(), TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
                     break;
 
                 case VARIABLE:
                     block.addInstruction(parseAssignment());
+                    accept(currentToken, TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
                     break;
 
                 default:
@@ -117,8 +120,7 @@ public class Parser {
 
         function.setName(currentToken.getStringValue());
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
-            throw new Exception("Oczekiwane wyrażenie: (");
+        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
 
@@ -141,37 +143,23 @@ public class Parser {
             }
         }
 
-        if (!checkTokenType(getToken(),TokenType.SEMICOLON)) {
-            throw new Exception("Oczekiwanie wyrażenie: ;");
-        }
-
         return function;
     }
 
     private Assignment parseAssignment() throws Exception {
-        Assignment assignment = new Assignment();
+        Variable variable = parseVariable();
 
-        assignment.setVariable(parseVariable());
-
-        if (!checkTokenType(getToken(), TokenType.ASSIGNMENT)) {
-            throw new Exception("Oczekiwane wyrażenie: =");
-        }
+        accept(getToken(), TokenType.ASSIGNMENT, "=");
 
         getToken();
-        assignment.setValue(parseAssignable());
+        Node assignable = parseAssignable();
 
-        if (!checkTokenType(currentToken, TokenType.SEMICOLON)) {
-            throw new Exception("Oczekiwane wyrażenie: ;");
-        }
-
-        return assignment;
+        return new Assignment(variable, assignable);
     }
 
     private Node parseAssignable() throws Exception {
         switch (currentToken.getTokenType()) {
             case FUNCTION:
-                return parseFunction();
-
             case MINUS:
             case VARIABLE:
             case INTEGER:
@@ -187,61 +175,47 @@ public class Parser {
     }
 
     private RepeatStatement parseRepeatStatement() throws Exception {
-        RepeatStatement repeatStatement = new RepeatStatement();
+        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN)) {
-            throw new Exception("Oczekiwane wyrażenie: (");
-        }
+        accept(getToken(), TokenType.INTEGER, "Oczekiwane wyrażenie: liczba całkowita");
 
-        if (!checkTokenType(getToken(), TokenType.INTEGER)) {
-            throw new Exception("Oczekiwane wyrażenie: liczba całkowita");
-        }
+        int repeatingCount = currentToken.getIntValue();
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_CLOSE)) {
-            throw new Exception("Oczekiwane wyrażenie: )");
-        }
+        accept(getToken(), TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
-        repeatStatement.setCodeBlock(parseBlock());
+        Block codeBlock = parseBlock();
 
-        return repeatStatement;
+        return new RepeatStatement(codeBlock,repeatingCount);
     }
 
     private IfStatement parseIfStatement() throws Exception {
-        IfStatement ifStatement = new IfStatement();
-
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
-            throw new Exception("Oczekiwane wyrażenie: (");
+        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         getToken();
-        ifStatement.setCondition(parseCondition());
+        Condition condition = parseCondition();
 
-        if (!checkTokenType(currentToken, TokenType.PARENTHESIS_CLOSE))
-            throw new Exception("Oczekiwane wyrażenie: )");
+        accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
-        ifStatement.setCodeBlock(parseBlock());
+        Block codeBlock = parseBlock();
 
+        Block elseCodeBlock = null;
         if (checkTokenType(currentToken, TokenType.ELSE)) {
-            ifStatement.setElse(true);
-            ifStatement.setElseCodeBlock(parseBlock());
+            elseCodeBlock = parseBlock();
         }
 
-        return ifStatement;
+        return new IfStatement(codeBlock, elseCodeBlock, condition);
     }
 
     private RepeatIfStatement parseRepeatIfStatement() throws Exception {
-        RepeatIfStatement repeatIfStatement = new RepeatIfStatement();
+        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
-        if (!checkTokenType(getToken(), TokenType.PARENTHESIS_OPEN))
-            throw new Exception("Oczekiwane wyrażenie: (");
+        Condition condition = parseCondition();
 
-        repeatIfStatement.setCondition(parseCondition());
+        accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
-        if (!checkTokenType(currentToken, TokenType.PARENTHESIS_CLOSE))
-            throw new Exception("Oczekiwane wyrażenie: )");
+        Block codeBlock = parseBlock();
 
-        repeatIfStatement.setCodeBlock(parseBlock());
-
-        return repeatIfStatement;
+        return new RepeatIfStatement(codeBlock, condition);
     }
 
     private Condition parseCondition() throws Exception {
@@ -388,10 +362,7 @@ public class Parser {
     }
 
     private Variable parseVariable() {
-        Variable variable = new Variable();
-        variable.setName(currentToken.getStringValue());
-
-        return variable;
+        return new Variable(currentToken.getStringValue());
     }
 }
 
