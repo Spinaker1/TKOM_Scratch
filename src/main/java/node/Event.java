@@ -11,6 +11,7 @@ public class Event extends Node {
         this.eventType = eventType;
         this.argument = argument;
         this.codeBlock = codeBlock;
+        this.nodeType = NodeType.EVENT;
     }
 
     public EventType getEventType() {

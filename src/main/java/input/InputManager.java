@@ -16,10 +16,24 @@ public class InputManager {
     private char currentChar;
     private char nextChar;
 
+    public InputManager() {
+        inputStream = null;
+        fileLength = 0;
+    }
+
     public InputManager(String string) {
          inputStream = new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8));
          fileLength = string.length()+1;
          next();
+    }
+
+    public void setInputStream(String string) {
+        positionInLine = 0;
+        lineNumber = 1;
+        positionInFile = 0;
+        inputStream = new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8));
+        fileLength = string.length() + 1;
+        next();
     }
 
     public char getCurrentChar() {
@@ -30,22 +44,19 @@ public class InputManager {
         return nextChar;
     }
 
-
     public void next() {
-        positionInFile++;
-
         char character='d';
 
         try {
             character = (char) inputStream.read();
+            positionInFile++;
+            positionInLine++;
             while(character == '\n') {
-                positionInFile++;
                 character = (char) inputStream.read();
                 lineNumber++;
+                positionInFile++;
                 positionInLine = 0;
             }
-
-            positionInLine++;
         }
         catch (IOException e) {
         }
@@ -67,7 +78,7 @@ public class InputManager {
     }
 
     public boolean isEoF() {
-        if (positionInFile >= fileLength)
+        if (positionInFile > fileLength)
             return true;
         return (int) currentChar == -1;
     }

@@ -533,8 +533,9 @@ public class LexerTest {
     public void shouldCorrectlyParseAllTokens() {
         try {
             String value = "idzLewo(50); #Idę w lewo 50 pikseli \n" +
-                    "jezeli (a == 4) { c = \"kwiat\"; }\n";
-            Lexer lexer = new Lexer(new InputManager(value));
+                    "jezeli (a == 4) { c = \"kwiat\"; }";
+            InputManager source = new InputManager(value);
+            Lexer lexer = new Lexer(source);
 
             Token token = lexer.getNextToken();
             assertEquals(TokenType.FUNCTION, token.getTokenType());

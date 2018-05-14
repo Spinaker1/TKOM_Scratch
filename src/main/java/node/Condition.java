@@ -5,14 +5,13 @@ import token.TokenType;
 import java.util.LinkedList;
 
 public class Condition extends Node{
-    private LinkedList<TokenType> operators = new LinkedList<>();
-    private LinkedList<Node> operands = new LinkedList<>();
-
-    public Condition() { }
+    private LinkedList<TokenType> operators;
+    private LinkedList<Node> operands;
 
     public Condition(LinkedList<TokenType> operators, LinkedList<Node> operands) {
         this.operators = operators;
         this.operands = operands;
+        this.nodeType = NodeType.CONDITION;
     }
 
     public void addOperator(final TokenType operator) {

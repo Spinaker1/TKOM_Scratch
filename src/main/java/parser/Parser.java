@@ -21,14 +21,15 @@ public class Parser {
         while((event = parseEvent()) != null) {
             eventList.add(event);
         }
-        accept(currentToken,TokenType.EOF,"Nieprawidłowe wyrażenie");
+
+        accept(currentToken,TokenType.EOF,"Nieprawidłowe wyrażenie.");
 
         return new Program(eventList);
     }
 
     private Token getToken() throws Exception {
-
         Token token = lexer.getNextToken();
+
         currentToken = token;
 
         return token;
@@ -147,7 +148,7 @@ public class Parser {
         accept(getToken(), TokenType.ASSIGNMENT, "Oczekiwane wyrażenie: =");
 
         getToken();
-        Node assignable = parseAssignable();
+        Assignable assignable = parseAssignable();
 
         return new Assignment(variable, assignable);
     }

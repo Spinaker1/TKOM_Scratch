@@ -1,3 +1,3 @@
 package node;
 
-enum VariableType { STRING, INT }
+public enum VariableType { STRING, INT }

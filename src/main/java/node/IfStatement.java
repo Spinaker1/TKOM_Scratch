@@ -9,6 +9,7 @@ public class IfStatement extends Node {
         this.codeBlock = codeBlock;
         this.elseCodeBlock = elseCodeBlock;
         this.condition = condition;
+        this.nodeType = NodeType.IF_STATEMENT;
     }
 
     public Block getCodeBlock() {

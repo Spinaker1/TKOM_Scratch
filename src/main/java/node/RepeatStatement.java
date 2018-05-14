@@ -7,6 +7,7 @@ public class RepeatStatement extends Node {
     public RepeatStatement(Block codeBlock, int repeatingCount) {
         this.codeBlock = codeBlock;
         this.repeatingCount = repeatingCount;
+        this.nodeType = NodeType.REPEAT_STATEMENT;
     }
 
     public Block getCodeBlock() {

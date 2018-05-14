@@ -11,6 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lexer.Lexer;
+import node.Assignment;
 import node.Program;
 import parser.Parser;
 import semantic.SemanticParser;
@@ -47,14 +48,25 @@ public class Main extends Application {
         Button button = new Button("Kompiluj");
         root.getChildren().add(button);
 
+        InputManager source = new InputManager();
+        Lexer lexer = new Lexer(source);
+        Parser parser = new Parser(lexer);
+        SemanticParser semanticParser = new SemanticParser();
+
         button.setOnAction(e -> {
             try {
-                InputManager source = new InputManager(consoleTextArea.getText());
-                Lexer lexer = new Lexer(source);
-                Parser parser = new Parser(lexer);
+                errorTextArea.setText("");
+                source.setInputStream(consoleTextArea.getText());
                 Program program = parser.parse();
+                semanticParser.check(program);
+                errorTextArea.setText("Program skompilował się pomyślnie.");
             } catch (Exception exc) {
-                errorTextArea.setText(exc.getMessage());
+                exc.printStackTrace();
+                String errorText = "Błąd:\n" + exc.getMessage() + "\nLinia: "
+                        + source.getLineNumber() + " Znak: " + source.getPositionInLine();
+                errorTextArea.setText(errorText);
+                consoleTextArea.requestFocus();
+                consoleTextArea.positionCaret(source.getPositionInFile());
             }
         });
 

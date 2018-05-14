@@ -3,6 +3,7 @@ package semantic;
 import token.EventType;
 import token.Token;
 import node.*;
+import token.TokenType;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -68,6 +69,8 @@ public class SemanticParser {
         }
     }
 
+    private void checkArgumentsType(LinkedList<Assignable> arguments, NodeType[] nodeTypes) {
+    }
 
     private void checkFunction(Function function) throws Exception {
         LinkedList<Assignable> arguments = function.getArguments();
@@ -106,7 +109,18 @@ public class SemanticParser {
     }
 
     private void checkAssignment(Assignment assignment) throws Exception {
+        System.out.println("assigment");
+        Assignable assignable = assignment.getValue();
+        Variable variable = assignment.getVariable();
 
+        if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
+            variable.setVariableType(VariableType.STRING);
+            variable.setStringValue(((StringLiteral) assignable).getValue());
+        }
+        else {
+            Expression expression = (Expression) assignable;
+            checkExpression(expression);
+        }
     }
 
     private void checkIfStatement(IfStatement ifStatement) throws Exception {
@@ -119,5 +133,9 @@ public class SemanticParser {
 
     private void checkRepeatIfStatement(RepeatIfStatement repeatIfStatement) throws Exception {
 
+    }
+
+    private void checkExpression(Expression expression) throws Exception {
+        System.out.println("expression");
     }
 }

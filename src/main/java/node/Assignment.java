@@ -2,9 +2,10 @@ package node;
 
 public class Assignment extends Node {
     private Variable variable;
-    private Node value;
+    private Assignable value;
 
-    public Assignment(Variable variable, Node value) {
+    public Assignment(Variable variable, Assignable value) {
+        this.nodeType = NodeType.ASSIGMENT;
         this.variable = variable;
         this.value = value;
     }
@@ -13,7 +14,7 @@ public class Assignment extends Node {
         return variable;
     }
 
-    public Node getValue() {
+    public Assignable getValue() {
         return value;
     }
 }

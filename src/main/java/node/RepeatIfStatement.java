@@ -7,6 +7,7 @@ public class RepeatIfStatement extends Node {
     public RepeatIfStatement(Block codeBlock, Condition condition) {
         this.codeBlock = codeBlock;
         this.condition = condition;
+        this.nodeType = NodeType.REPEAT_IF_STATEMENT;
     }
 
     public Block getCodeBlock() {

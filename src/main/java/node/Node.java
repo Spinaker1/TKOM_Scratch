@@ -1,7 +1,7 @@
 package node;
 
 public class Node {
-    protected NodeType nodeType;
+    NodeType nodeType;
 
     public NodeType getNodeType() {
         return nodeType;

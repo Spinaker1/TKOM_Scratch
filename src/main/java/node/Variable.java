@@ -7,6 +7,7 @@ public class Variable extends Operand {
     private int intValue;
 
     public Variable(String name) {
+        this.nodeType = NodeType.VARIABLE;
         this.name = name;
     }
 
@@ -24,5 +25,17 @@ public class Variable extends Operand {
 
     public int getIntValue() {
         return intValue;
+    }
+
+    public void setVariableType(VariableType variableType) {
+        this.variableType = variableType;
+    }
+
+    public void setStringValue(String stringValue) {
+        this.stringValue = stringValue;
+    }
+
+    public void setIntValue(int intValue) {
+        this.intValue = intValue;
     }
 }
