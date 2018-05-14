@@ -9,6 +9,7 @@ public class Function extends Operand {
     private LinkedList<Assignable> arguments;
 
     public Function(FunctionType functionType, LinkedList<Assignable> arguments) {
+        this.nodeType = NodeType.FUNCTION;
         this.functionType = functionType;
         this.arguments = arguments;
     }

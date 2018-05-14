@@ -39,6 +39,7 @@ public class InputManager {
         try {
             character = (char) inputStream.read();
             while(character == '\n') {
+                positionInFile++;
                 character = (char) inputStream.read();
                 lineNumber++;
                 positionInLine = 0;
@@ -66,7 +67,7 @@ public class InputManager {
     }
 
     public boolean isEoF() {
-        if (positionInFile > fileLength)
+        if (positionInFile >= fileLength)
             return true;
         return (int) currentChar == -1;
     }

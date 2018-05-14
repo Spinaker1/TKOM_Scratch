@@ -1,0 +1,16 @@
+package node;
+
+public enum NodeType {
+    ASSIGMENT,
+    BLOCK,
+    CONDITION,
+    EVENT,
+    EXPRESSION,
+    FUNCTION,
+    IF_STATEMENT,
+    INT_LITERAL,
+    REPEAT_IF_STATEMENT,
+    REPEAT_STATEMENT,
+    STRING_LITERAL,
+    VARIABLE
+}

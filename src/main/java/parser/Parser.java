@@ -21,13 +21,14 @@ public class Parser {
         while((event = parseEvent()) != null) {
             eventList.add(event);
         }
+        accept(currentToken,TokenType.EOF,"Nieprawidłowe wyrażenie");
 
         return new Program(eventList);
     }
 
     private Token getToken() throws Exception {
-        Token token = lexer.getNextToken();
 
+        Token token = lexer.getNextToken();
         currentToken = token;
 
         return token;
