@@ -19,4 +19,8 @@ public class IfStatement extends Node {
     public Condition getCondition() {
         return condition;
     }
+
+    public Block getElseCodeBlock() {
+        return elseCodeBlock;
+    }
 }

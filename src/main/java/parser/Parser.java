@@ -198,7 +198,7 @@ public class Parser {
             throw new Exception();
 
         Block elseCodeBlock = null;
-        if (checkTokenType(currentToken, TokenType.ELSE)) {
+        if (checkTokenType(getToken(), TokenType.ELSE)) {
             if ((elseCodeBlock = parseBlock()) == null)
                 throw new Exception();
         }

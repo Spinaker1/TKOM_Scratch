@@ -187,7 +187,7 @@ public class ParserTest {
             Expression expression2 = (Expression) expression1.getOperands().get(0);
             IntLiteral intLiteral = (IntLiteral) expression2.getOperands().get(0);
             Variable var2 = (Variable) expression2.getOperands().get(1);
-            TokenType operation = expression2.getOperations().get(0);
+            TokenType operation = expression2.getOperators().get(0);
 
             assertEquals("x", var1.getName());
             assertEquals(4, intLiteral.getValue());

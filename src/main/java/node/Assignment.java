@@ -5,7 +5,7 @@ public class Assignment extends Node {
     private Assignable value;
 
     public Assignment(Variable variable, Assignable value) {
-        this.nodeType = NodeType.ASSIGMENT;
+        this.nodeType = NodeType.ASSIGNMENT;
         this.variable = variable;
         this.value = value;
     }

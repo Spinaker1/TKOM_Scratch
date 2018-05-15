@@ -1,7 +1,7 @@
 package node;
 
 public enum NodeType {
-    ASSIGMENT,
+    ASSIGNMENT,
     BLOCK,
     CONDITION,
     EVENT,

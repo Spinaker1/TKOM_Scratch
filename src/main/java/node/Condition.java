@@ -26,7 +26,7 @@ public class Condition extends Node{
         return operands;
     }
 
-    public LinkedList<TokenType> getoperators() {
+    public LinkedList<TokenType> getOperators() {
         return operators;
     }
 }

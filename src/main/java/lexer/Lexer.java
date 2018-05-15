@@ -37,7 +37,7 @@ public class Lexer {
     }
 
     private Token processInteger() throws Exception {
-        if (source.getCurrentChar() == '0')
+        if (source.getCurrentChar() == '0' && Character.isDigit(source.getNextChar()))
             throw new Exception("Liczba nie powinna zaczynać się od 0.");
 
         int number = source.getCurrentChar()-'0';

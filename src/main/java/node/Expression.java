@@ -20,7 +20,7 @@ public class Expression extends Operand {
         return operands;
     }
 
-    public LinkedList<TokenType> getOperations() {
+    public LinkedList<TokenType> getOperators() {
         return operators;
     }
 

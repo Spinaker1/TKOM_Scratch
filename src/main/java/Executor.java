@@ -1,16 +1,20 @@
 import gui.Sprite;
 import node.*;
+import token.EventType;
 
 import java.util.LinkedList;
 
 public class Executor {
     private Sprite sprite;
 
-    public void execute(Sprite sprite, Program program)  {
+    public void execute(Sprite sprite, Program program, EventType eventType)  {
         this.sprite = sprite;
 
         for (Event event : program.getEvents()) {
-            executeEvent(event);
+            if (event.getEventType() == eventType) {
+                executeEvent(event);
+                break;
+            }
         }
     }
 
@@ -25,7 +29,7 @@ public class Executor {
                     executeFunction((Function) instruction);
                     break;
 
-                case ASSIGMENT:
+                case ASSIGNMENT:
                     executeAssignment((Assignment) instruction);
                     break;
 
@@ -43,7 +47,6 @@ public class Executor {
             }
         }
     }
-
 
     private void executeFunction(Function function)  {
         System.out.println("function");
@@ -69,6 +72,13 @@ public class Executor {
             case GO_DOWN:
                 sprite.moveDown(((Expression)arguments.get(0)).getValue());
                 break;
+
+            case TALK:
+                String value;
+                StringLiteral stringLiteral = (StringLiteral) arguments.get(0);
+                value = stringLiteral.getValue();
+                sprite.talk(value);
+                break;
         }
     }
 
@@ -78,12 +88,11 @@ public class Executor {
         Variable variable = assignment.getVariable();
 
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
-            variable.setVariableType(VariableType.STRING);
-            variable.setStringValue(((StringLiteral) assignable).getValue());
+
         }
         else {
             Expression expression = (Expression) assignable;
-            executeAssignable(expression);
+            System.out.println(executeAssignable(expression));
         }
     }
 
@@ -110,7 +119,19 @@ public class Executor {
             return ((IntLiteral)assignable).getValue();
         }
 
-        else if (assignable.getNodeType() == NodeType.EXPRESSION) {
+        if (assignable.getNodeType() == NodeType.FUNCTION) {
+            Function function = (Function) assignable;
+            switch (function.getFunctionType()) {
+                case GET_X:
+                    return (int)sprite.getX();
+                case GET_Y:
+                    return (int)sprite.getY();
+                case GET_ROTATION:
+                    return (int)sprite.getRotate();
+            }
+        }
+
+        if (assignable.getNodeType() == NodeType.EXPRESSION) {
             Expression expression = (Expression) assignable;
             int i = -1;
             int value = 0;
@@ -120,7 +141,7 @@ public class Executor {
                     value = executeAssignable(operand);
                 }
                 else {
-                    switch(expression.getOperations().get(i)) {
+                    switch(expression.getOperators().get(i)) {
                         case ADD:
                             value+=executeAssignable(operand);
                             break;

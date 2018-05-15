@@ -1,13 +1,11 @@
 package semantic;
 
+import jdk.nashorn.internal.runtime.regexp.joni.constants.Arguments;
 import token.EventType;
-import token.Token;
 import node.*;
-import token.TokenType;
+import token.FunctionType;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class SemanticParser {
     public void check(Program program) throws Exception {
@@ -32,10 +30,10 @@ public class SemanticParser {
         for (Node instruction : block.getInstructions()) {
             switch (instruction.getNodeType()) {
                 case FUNCTION:
-                    checkFunction((Function) instruction);
+                    checkFunction((Function) instruction, scope);
                     break;
 
-                case ASSIGMENT:
+                case ASSIGNMENT:
                     checkAssignment((Assignment) instruction, scope);
                     break;
 
@@ -54,8 +52,10 @@ public class SemanticParser {
         }
     }
 
-    private void checkArgumentsCount(LinkedList<Assignable> arguments, int argumentsCount) throws Exception {
-        if (arguments.size() != argumentsCount) {
+    private void checkArgumentsCount(Function function) throws Exception {
+        int argumentsCount = FunctionArgumentsHashMap.FUNCTION_ARGUMENTS.get(function.getFunctionType()).length;
+
+        if (function.getArguments().size() != argumentsCount) {
             switch (argumentsCount) {
                 case 0:
                     throw new Exception("Funkcja nie powinna zawierać argumentów");
@@ -71,43 +71,36 @@ public class SemanticParser {
         }
     }
 
-    private void checkArgumentsType(LinkedList<Assignable> arguments, NodeType[] nodeTypes) {
+    private void checkArgumentsType(Function function, Scope scope) throws Exception {
+        int i = 0;
+        VariableType[] expectedVariableTypes = FunctionArgumentsHashMap.FUNCTION_ARGUMENTS.get(function.getFunctionType());
+
+        for (Assignable argument : function.getArguments()) {
+            if (expectedVariableTypes[i] == VariableType.STRING) {
+                if (argument.getNodeType() == NodeType.STRING_LITERAL) {
+                    return;
+                } else {
+                    if (checkStringVariable(argument, scope)) {
+                        return;
+                    } else {
+                        throw new Exception("Argument powinien zawierać napis.");
+                    }
+                }
+            }
+
+            if (expectedVariableTypes[i] == VariableType.INT) {
+                if (argument.getNodeType() == NodeType.STRING_LITERAL) {
+                    throw new Exception("Argument powinien zawierać liczbę całkowitą.");
+                } else {
+                    checkAssignable(argument, scope);
+                }
+            }
+        }
     }
 
-    private void checkFunction(Function function) throws Exception {
-        LinkedList<Assignable> arguments = function.getArguments();
-
-        switch (function.getFunctionType()) {
-            case CHANGE_COLOR:
-                checkArgumentsCount(arguments, 3);
-                break;
-
-            case GO:
-                checkArgumentsCount(arguments, 2);
-                break;
-
-            case GO_LEFT:
-            case GO_RIGHT:
-            case GO_UP:
-            case GO_DOWN:
-            case ROTATE_RIGHT:
-            case ROTATE_LEFT:
-            case CHANGE_SIZE:
-            case WAIT:
-                checkArgumentsCount(arguments, 1);
-                break;
-
-            case TALK:
-                checkArgumentsCount(arguments, 1);
-                break;
-
-            case GET_X:
-            case GET_Y:
-            case GET_ROTATION:
-            case GO_TO_MOUSE:
-                checkArgumentsCount(arguments, 0);
-                break;
-        }
+    private void checkFunction(Function function, Scope scope) throws Exception {
+        checkArgumentsCount(function);
+        checkArgumentsType(function, scope);
     }
 
     private void checkAssignment(Assignment assignment, Scope scope) throws Exception {
@@ -116,8 +109,7 @@ public class SemanticParser {
 
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
             variable.setVariableType(VariableType.STRING);
-        }
-        else {
+        } else {
             Expression expression = (Expression) assignable;
             checkAssignable(expression, scope);
             variable.setVariableType(VariableType.INT);
@@ -130,6 +122,14 @@ public class SemanticParser {
         Block block = ifStatement.getCodeBlock();
         block.setScope(new Scope(scope));
         checkBlock(block);
+
+        Block elseBlock = ifStatement.getElseCodeBlock();
+        if (elseBlock != null) {
+            elseBlock.setScope(scope);
+            checkBlock(elseBlock);
+        }
+
+        checkCondition(ifStatement.getCondition(), scope);
     }
 
     private void checkRepeatStatement(RepeatStatement repeatStatement, Scope scope) throws Exception {
@@ -142,6 +142,7 @@ public class SemanticParser {
         Block block = repeatIfStatement.getCodeBlock();
         block.setScope(new Scope(scope));
         checkBlock(block);
+        checkCondition(repeatIfStatement.getCondition(), scope);
     }
 
     private void checkAssignable(Assignable assignable, Scope scope) throws Exception {
@@ -152,11 +153,21 @@ public class SemanticParser {
             }
         }
 
-        else if (assignable.getNodeType() == NodeType.VARIABLE) {
+        if (assignable.getNodeType() == NodeType.VARIABLE) {
             Variable variable = (Variable) assignable;
             checkVariable(variable, scope);
         }
+
+        if (assignable.getNodeType() == NodeType.FUNCTION) {
+            Function function = (Function) assignable;
+            FunctionType functionType = function.getFunctionType();
+            if (functionType != FunctionType.GET_X && functionType != FunctionType.GET_Y &&
+                    functionType != FunctionType.GET_ROTATION) {
+                throw new Exception("Podana funkcja nie zwraca wartości.");
+            }
+        }
     }
+
 
     private void checkVariable(Variable variable, Scope scope) throws Exception {
         if (!scope.containsVariable(variable.getName())) {
@@ -168,4 +179,43 @@ public class SemanticParser {
             throw new Exception("Zmienna musi zawierać liczbę całkowitą.");
         }
     }
+
+    private void checkCondition(Condition condition, Scope scope) throws Exception {
+        for (Node operand : condition.getOperands()) {
+            if (operand.getNodeType() == NodeType.CONDITION) {
+                Condition condition1 = (Condition) operand;
+                checkCondition(condition1, scope);
+            } else if (operand.getNodeType() == NodeType.EXPRESSION) {
+                Expression expression = (Expression) operand;
+                checkAssignable(expression, scope);
+            }
+        }
+    }
+
+    private boolean checkStringVariable(Assignable assignable, Scope scope) {
+        while (assignable.getNodeType() == NodeType.EXPRESSION) {
+            LinkedList<Operand> operands = ((Expression) assignable).getOperands();
+            if (operands.size() != 1) {
+                return false;
+            }
+            assignable = operands.get(0);
+        }
+
+        if (assignable.getNodeType() != NodeType.VARIABLE) {
+            return false;
+        }
+
+        Variable variable = (Variable) assignable;
+        if (!scope.containsVariable(variable.getName())) {
+            return false;
+        }
+
+        variable = scope.getVariable(variable.getName());
+        if (variable.getVariableType() != VariableType.STRING) {
+            return false;
+        }
+
+        return true;
+    }
 }
+

@@ -15,6 +15,7 @@ import node.Assignment;
 import node.Program;
 import parser.Parser;
 import semantic.SemanticParser;
+import token.EventType;
 
 import javax.swing.*;
 
@@ -52,15 +53,23 @@ public class Main extends Application {
         Lexer lexer = new Lexer(source);
         Parser parser = new Parser(lexer);
         SemanticParser semanticParser = new SemanticParser();
-        Executor executor = new Executor();
 
         button.setOnAction(e -> {
             try {
                 errorTextArea.setText("");
+
                 source.setInputStream(consoleTextArea.getText());
                 Program program = parser.parse();
                 semanticParser.check(program);
-                executor.execute(sprite, program);
+
+                MyThread myThread = new MyThread(sprite,program,EventType.START);
+                myThread.start();
+
+                sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1-> {
+                    myThread.stop();
+                    new MyThread(sprite,program,EventType.MOUSE).start();
+                });
+
                 errorTextArea.setText("Program skompilował się pomyślnie.");
             } catch (Exception exc) {
                 exc.printStackTrace();
@@ -75,5 +84,29 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+    }
+
+    private class MyThread extends Thread {
+        private Sprite sprite;
+        private Program program;
+        private Executor executor;
+        private EventType eventType;
+
+        MyThread(Sprite sprite, Program program, EventType eventType) {
+            super();
+            this.eventType = eventType;
+            this.sprite = sprite;
+            this.program = program;
+            this.executor = new Executor();
+        }
+
+        void setEventType(EventType eventType) {
+            this.eventType = eventType;
+        }
+
+        @Override
+        public void run() {
+            executor.execute(sprite, program, eventType);
+        }
     }
 }
