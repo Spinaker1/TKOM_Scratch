@@ -14,7 +14,7 @@ import java.awt.Point;
 import java.awt.MouseInfo;
 
 public class Sprite extends ImageView{
-    Stage stage;
+    private Stage stage;
 
     public Sprite(Stage stage) {
         this.stage = stage;

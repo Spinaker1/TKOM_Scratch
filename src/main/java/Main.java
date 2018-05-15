@@ -52,6 +52,7 @@ public class Main extends Application {
         Lexer lexer = new Lexer(source);
         Parser parser = new Parser(lexer);
         SemanticParser semanticParser = new SemanticParser();
+        Executor executor = new Executor();
 
         button.setOnAction(e -> {
             try {
@@ -59,6 +60,7 @@ public class Main extends Application {
                 source.setInputStream(consoleTextArea.getText());
                 Program program = parser.parse();
                 semanticParser.check(program);
+                executor.execute(sprite, program);
                 errorTextArea.setText("Program skompilował się pomyślnie.");
             } catch (Exception exc) {
                 exc.printStackTrace();

@@ -10,8 +10,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class SemanticParser {
-    private Map<String, Token> variables = new HashMap<>();
-
     public void check(Program program) throws Exception {
         for (Event event : program.getEvents()) {
             checkEvent(event);
@@ -23,10 +21,14 @@ public class SemanticParser {
             throw new Exception("Zdarzenie tego typu nie powinno mieć argumentu.");
         }
 
-        checkBlock(event.getCodeBlock());
+        Block block = event.getCodeBlock();
+        block.setScope(new Scope(null));
+        checkBlock(block);
     }
 
     private void checkBlock(Block block) throws Exception {
+        Scope scope = block.getScope();
+
         for (Node instruction : block.getInstructions()) {
             switch (instruction.getNodeType()) {
                 case FUNCTION:
@@ -34,19 +36,19 @@ public class SemanticParser {
                     break;
 
                 case ASSIGMENT:
-                    checkAssignment((Assignment) instruction);
+                    checkAssignment((Assignment) instruction, scope);
                     break;
 
                 case IF_STATEMENT:
-                    checkIfStatement((IfStatement) instruction);
+                    checkIfStatement((IfStatement) instruction, scope);
                     break;
 
                 case REPEAT_IF_STATEMENT:
-                    checkRepeatIfStatement((RepeatIfStatement) instruction);
+                    checkRepeatIfStatement((RepeatIfStatement) instruction, scope);
                     break;
 
                 case REPEAT_STATEMENT:
-                    checkRepeatStatement((RepeatStatement) instruction);
+                    checkRepeatStatement((RepeatStatement) instruction, scope);
                     break;
             }
         }
@@ -108,34 +110,62 @@ public class SemanticParser {
         }
     }
 
-    private void checkAssignment(Assignment assignment) throws Exception {
-        System.out.println("assigment");
+    private void checkAssignment(Assignment assignment, Scope scope) throws Exception {
         Assignable assignable = assignment.getValue();
         Variable variable = assignment.getVariable();
 
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
             variable.setVariableType(VariableType.STRING);
-            variable.setStringValue(((StringLiteral) assignable).getValue());
         }
         else {
             Expression expression = (Expression) assignable;
-            checkExpression(expression);
+            checkAssignable(expression, scope);
+            variable.setVariableType(VariableType.INT);
+        }
+
+        scope.putVariable(variable);
+    }
+
+    private void checkIfStatement(IfStatement ifStatement, Scope scope) throws Exception {
+        Block block = ifStatement.getCodeBlock();
+        block.setScope(new Scope(scope));
+        checkBlock(block);
+    }
+
+    private void checkRepeatStatement(RepeatStatement repeatStatement, Scope scope) throws Exception {
+        Block block = repeatStatement.getCodeBlock();
+        block.setScope(new Scope(scope));
+        checkBlock(block);
+    }
+
+    private void checkRepeatIfStatement(RepeatIfStatement repeatIfStatement, Scope scope) throws Exception {
+        Block block = repeatIfStatement.getCodeBlock();
+        block.setScope(new Scope(scope));
+        checkBlock(block);
+    }
+
+    private void checkAssignable(Assignable assignable, Scope scope) throws Exception {
+        if (assignable.getNodeType() == NodeType.EXPRESSION) {
+            Expression expression = (Expression) assignable;
+            for (Assignable operand : expression.getOperands()) {
+                checkAssignable(operand, scope);
+            }
+        }
+
+        else if (assignable.getNodeType() == NodeType.VARIABLE) {
+            Variable variable = (Variable) assignable;
+            checkVariable(variable, scope);
         }
     }
 
-    private void checkIfStatement(IfStatement ifStatement) throws Exception {
+    private void checkVariable(Variable variable, Scope scope) throws Exception {
+        if (!scope.containsVariable(variable.getName())) {
+            throw new Exception("Użyto niezainicjalizowanej zmiennej.");
+        }
 
-    }
-
-    private void checkRepeatStatement(RepeatStatement repeatStatement) throws Exception {
-
-    }
-
-    private void checkRepeatIfStatement(RepeatIfStatement repeatIfStatement) throws Exception {
-
-    }
-
-    private void checkExpression(Expression expression) throws Exception {
-        System.out.println("expression");
+        variable = scope.getVariable(variable.getName());
+        if (variable.getVariableType() != VariableType.INT) {
+            throw new Exception("Zmienna musi zawierać liczbę całkowitą.");
+        }
     }
 }
