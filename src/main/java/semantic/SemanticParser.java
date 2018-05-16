@@ -119,6 +119,13 @@ public class SemanticParser {
         Assignable assignable = assignment.getValue();
         Variable variable = assignment.getVariable();
 
+        if (!scope.containsVariable(variable.getName())) {
+            scope.putVariable(variable);
+        }
+        else {
+            variable = scope.getVariable(variable.getName());
+        }
+
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
             variable.setVariableType(VariableType.STRING);
         } else {
@@ -127,7 +134,7 @@ public class SemanticParser {
             variable.setVariableType(VariableType.INT);
         }
 
-        scope.putVariable(variable);
+
     }
 
     private void checkIfStatement(IfStatement ifStatement, Scope scope) throws Exception {

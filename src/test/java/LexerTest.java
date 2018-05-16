@@ -517,7 +517,7 @@ public class LexerTest {
     @Test
     public void shouldCorrectlyParseAllTokens() {
         try {
-            String value = "idzLewo(50); #Idę w lewo 50 pikseli \n" +
+            String value = "idzLewo(50); #Ide w lewo 50 pikseli \n" +
                     "jezeli (a == 4) { c = \"kwiat\"; }";
             InputManager source = new InputManager(value);
             Lexer lexer = new Lexer(source);

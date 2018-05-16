@@ -180,7 +180,6 @@ public class Lexer {
 
             while (lineNumber == source.getLineNumber()  && !isEoF())
             {
-                System.out.println(source.getCurrentChar());
                 source.next();
             }
             source.next();

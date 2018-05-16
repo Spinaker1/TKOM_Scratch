@@ -8,8 +8,8 @@ public class ConsoleTextArea extends TextArea {
     public ConsoleTextArea(final double windowWidth, final double windowHeight) {
         super();
         setMaxWidth(width);
-        setMinHeight(windowHeight);
+        setMinHeight(windowHeight-25);
         setLayoutX(windowWidth-width);
-        setLayoutY(0);
+        setLayoutY(25);
     }
 }

@@ -30,14 +30,16 @@ public class Executor {
     }
 
     private void executeBlock(Block block) {
+        Scope scope = block.getScope();
+
         for (Node instruction : block.getInstructions()) {
             switch (instruction.getNodeType()) {
                 case FUNCTION:
-                    executeFunction((Function) instruction);
+                    executeFunction((Function) instruction, scope);
                     break;
 
                 case ASSIGNMENT:
-                    executeAssignment((Assignment) instruction);
+                    executeAssignment((Assignment) instruction,scope);
                     break;
 
                 case IF_STATEMENT:
@@ -55,12 +57,12 @@ public class Executor {
         }
     }
 
-    private void executeFunction(Function function)  {
+    private void executeFunction(Function function, Scope scope)  {
         System.out.println("function");
         LinkedList<Assignable> arguments = function.getArguments();
 
         for(Assignable argument: arguments) {
-            executeAssignable(argument);
+            executeAssignable(argument, scope);
         }
 
         switch (function.getFunctionType()) {
@@ -120,17 +122,18 @@ public class Executor {
         }
     }
 
-    private void executeAssignment(Assignment assignment)  {
+    private void executeAssignment(Assignment assignment, Scope scope)  {
         System.out.println("assigment");
         Assignable assignable = assignment.getValue();
-        Variable variable = assignment.getVariable();
+        Variable variable = scope.getVariable(assignment.getVariable().getName());
 
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
 
         }
         else {
             Expression expression = (Expression) assignable;
-            System.out.println(executeAssignable(expression));
+            variable.setIntValue(executeAssignable(expression,scope));
+            System.out.println(variable.getIntValue());
         }
     }
 
@@ -150,10 +153,9 @@ public class Executor {
 
     }
 
-    private int executeAssignable(Assignable assignable)  {
+    private int executeAssignable(Assignable assignable, Scope scope)  {
         System.out.println("assignable");
         if (assignable.getNodeType() == NodeType.INT_LITERAL) {
-            System.out.println(((IntLiteral)assignable).getValue());
             return ((IntLiteral)assignable).getValue();
         }
 
@@ -171,37 +173,47 @@ public class Executor {
 
         if (assignable.getNodeType() == NodeType.EXPRESSION) {
             Expression expression = (Expression) assignable;
-            int i = -1;
-            int value = 0;
+            return executeExpression(expression,scope);
+        }
 
-            for (Assignable operand: expression.getOperands()) {
-                if (i == -1) {
-                    value = executeAssignable(operand);
-                }
-                else {
-                    switch(expression.getOperators().get(i)) {
-                        case ADD:
-                            value+=executeAssignable(operand);
-                            break;
-                        case MINUS:
-                            value-=executeAssignable(operand);
-                            break;
-                        case MULTIPLY:
-                            value*=executeAssignable(operand);
-                            break;
-                        case DIVIDE:
-                            value/=executeAssignable(operand);
-                            break;
-                    }
-                }
-
-                i++;
-            }
-
-            expression.setValue(value);
-            return value;
+        if (assignable.getNodeType() == NodeType.VARIABLE) {
+            Variable variable = (Variable) assignable;
+            variable = scope.getVariable(variable.getName());
+            return variable.getIntValue();
         }
 
         return 0;
+    }
+
+    private int executeExpression(Expression expression, Scope scope) {
+        int i = -1;
+        int value = 0;
+
+        for (Assignable operand: expression.getOperands()) {
+            if (i == -1) {
+                value = executeAssignable(operand,scope);
+            }
+            else {
+                switch(expression.getOperators().get(i)) {
+                    case ADD:
+                        value+=executeAssignable(operand,scope);
+                        break;
+                    case MINUS:
+                        value-=executeAssignable(operand,scope);
+                        break;
+                    case MULTIPLY:
+                        value*=executeAssignable(operand,scope);
+                        break;
+                    case DIVIDE:
+                        value/=executeAssignable(operand,scope);
+                        break;
+                }
+            }
+
+            i++;
+        }
+
+        expression.setValue(value);
+        return value;
     }
 }

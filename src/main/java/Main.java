@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Main extends Application {
     private final int WIDTH = 1000;
-    private final int HEIGHT = 600;
+    private final int HEIGHT = 550;
 
     private Map<Sprite, SpriteThread> spriteThreadsHashMap = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class Main extends Application {
 
     private TextArea consoleTextArea = new ConsoleTextArea(WIDTH, HEIGHT);
     private TextArea errorTextArea = new ErrorTextArea(WIDTH, HEIGHT);
-    SpritesBoard spritesBoard;
+    private SpritesBoard spritesBoard;
 
     public static void main(String[] args) {
         launch(args);
@@ -52,12 +52,13 @@ public class Main extends Application {
 
         sprite = new Sprite(primaryStage);
         spritesBoard = new SpritesBoard(sprite);
-        root.getChildren().add(spritesBoard);
-
         root.getChildren().add(consoleTextArea);
         root.getChildren().add(errorTextArea);
+        root.getChildren().add(spritesBoard);
+
 
         HBox hBox = new HBox();
+        hBox.setLayoutX(600);
 
         Button button = new Button("Kompiluj");
         setupCompileButton(button);
@@ -89,7 +90,6 @@ public class Main extends Application {
 
                 errorTextArea.setText("Program skompilował się pomyślnie.");
             } catch (Exception exc) {
-                exc.printStackTrace();
                 String errorText = "Błąd:\n" + exc.getMessage() + "\nLinia: "
                         + source.getLineNumber() + " Znak: " + source.getPositionInLine();
                 errorTextArea.setText(errorText);

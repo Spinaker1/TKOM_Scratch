@@ -8,7 +8,7 @@ public class SpritesBoard extends Pane {
 
     public SpritesBoard(Sprite sprite) {
         setLayoutX(0);
-        setLayoutY(50);
+        setLayoutY(0);
         setMinHeight(height);
         setMinWidth(width);
         setMaxHeight(height);
