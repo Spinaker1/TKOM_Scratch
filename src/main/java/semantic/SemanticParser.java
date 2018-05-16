@@ -1,15 +1,27 @@
 package semantic;
 
-import jdk.nashorn.internal.runtime.regexp.joni.constants.Arguments;
-import token.EventType;
 import node.*;
+import token.EventType;
 import token.FunctionType;
 
 import java.util.LinkedList;
 
 public class SemanticParser {
     public void check(Program program) throws Exception {
+        LinkedList<EventType> eventTypesInProgram = new LinkedList<>();
+
         for (Event event : program.getEvents()) {
+            switch (event.getEventType()) {
+                case START:
+                case MOUSE:
+                case WALL:
+                    if (eventTypesInProgram.contains(event.getEventType())) {
+                        throw new Exception("Program zawiera więcej niż jedno zdarzenie danego typu.");
+                    }
+                    eventTypesInProgram.add(event.getEventType());
+                    break;
+            }
+
             checkEvent(event);
         }
     }

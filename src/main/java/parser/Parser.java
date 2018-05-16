@@ -32,8 +32,6 @@ public class Parser {
 
         currentToken = token;
 
-        System.out.println(token.getTokenType());
-
         return token;
     }
 
