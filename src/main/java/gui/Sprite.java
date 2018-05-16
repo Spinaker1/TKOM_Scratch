@@ -3,6 +3,8 @@ package gui;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Light;
@@ -34,11 +36,10 @@ public class Sprite extends ImageView {
     }
 
     public void moveToMouse() {
-        Image image = getImage();
         Point p = MouseInfo.getPointerInfo().getLocation().getLocation();
         Scene scene = stage.getScene();
-        double x = p.getX() - stage.getX() - scene.getX() - image.getWidth() / 2;
-        double y = p.getY() - stage.getY() - scene.getY() - image.getHeight() / 2;
+        double x = p.getX() - stage.getX() - scene.getX() - getWidth() / 2;
+        double y = p.getY() - stage.getY() - scene.getY() - getHeight() / 2;
         this.setX(x);
         this.setY(y);
     }
@@ -185,19 +186,18 @@ public class Sprite extends ImageView {
                 "    -fx-background-insets: 0,1;\n" +
                 "    -fx-padding: 50;";
 
-        Image image = getImage();
-
         Label label = new Label(text);
-        label.setLayoutX(this.getX() + image.getWidth());
+        label.setLayoutX(this.getX() + getWidth());
         label.setLayoutY(this.getY());
         label.setStyle(css);
 
         Pane pane = (Pane) getParent().getParent();
-        pane.getChildren().add(label);
+        Platform.runLater(()-> pane.getChildren().add(label));
 
         PauseTransition pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(e -> pane.getChildren().remove(label));
         pause.play();
+        sleep(3);
     }
 
     public void sleep(int seconds) {
@@ -218,5 +218,13 @@ public class Sprite extends ImageView {
         if (timeline != null) {
             timeline.stop();
         }
+    }
+
+    public double getWidth() {
+        return getImage().getWidth();
+    }
+
+    public double getHeight() {
+        return  getImage().getHeight();
     }
 }

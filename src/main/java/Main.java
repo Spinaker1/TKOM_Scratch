@@ -9,6 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lexer.Lexer;
+import node.Event;
 import node.Program;
 import parser.Parser;
 import semantic.SemanticParser;
@@ -24,6 +25,8 @@ public class Main extends Application {
 
     private Map<Sprite, SpriteThread> spriteThreadsHashMap = new HashMap<>();
 
+    private CollisionThread collisionThread = new CollisionThread();
+
     private Sprite sprite;
 
     private InputManager source = new InputManager();
@@ -33,6 +36,7 @@ public class Main extends Application {
 
     private TextArea consoleTextArea = new ConsoleTextArea(WIDTH, HEIGHT);
     private TextArea errorTextArea = new ErrorTextArea(WIDTH, HEIGHT);
+    SpritesBoard spritesBoard;
 
     public static void main(String[] args) {
         launch(args);
@@ -40,14 +44,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("Scratch");
         ImagesManager.loadImages();
 
         Pane root = new Pane();
         Scene scene = new Scene(root, WIDTH, HEIGHT);
 
         sprite = new Sprite(primaryStage);
-        SpritesBoard spritesBoard = new SpritesBoard(sprite);
+        spritesBoard = new SpritesBoard(sprite);
         root.getChildren().add(spritesBoard);
 
         root.getChildren().add(consoleTextArea);
@@ -64,8 +68,11 @@ public class Main extends Application {
         hBox.getChildren().addAll(button, button1);
         root.getChildren().add(hBox);
 
+        collisionThread.start();
+
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
+        primaryStage.setOnCloseRequest(e -> collisionThread.stop());
         primaryStage.show();
     }
 
@@ -94,25 +101,30 @@ public class Main extends Application {
 
     private void setupExecuteButton(Button button) {
         button.setOnAction(e -> {
-            SpriteThread spriteThread = new SpriteThread(sprite, EventType.START);
-            spriteThreadsHashMap.put(sprite,spriteThread);
-            spriteThread.start();
+            startNewSpriteThread(EventType.START);
 
             sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1 -> {
-                sprite.stopTimeLine();
-                
-                if (spriteThreadsHashMap.containsKey(sprite)) {
-                    SpriteThread spriteThreadToDelete = spriteThreadsHashMap.get(sprite);
-                    spriteThreadsHashMap.remove(sprite);
-                    spriteThreadToDelete.stop();
-                }
-
-                SpriteThread mouseSpriteThread = new SpriteThread(sprite, EventType.MOUSE);
-                spriteThreadsHashMap.put(sprite,mouseSpriteThread);
-                mouseSpriteThread.start();
+                startNewSpriteThread(EventType.MOUSE);
             });
-
         });
+    }
+
+    private void startNewSpriteThread(EventType eventType) {
+        sprite.stopTimeLine();
+
+        stopSpriteThread();
+
+        SpriteThread newSpriteThread = new SpriteThread(sprite, eventType);
+        spriteThreadsHashMap.put(sprite, newSpriteThread);
+        newSpriteThread.start();
+    }
+
+    private void stopSpriteThread() {
+        if (spriteThreadsHashMap.containsKey(sprite)) {
+            SpriteThread spriteThreadToDelete = spriteThreadsHashMap.get(sprite);
+            spriteThreadsHashMap.remove(sprite);
+            spriteThreadToDelete.stop();
+        }
     }
 
     private class SpriteThread extends Thread {
@@ -130,6 +142,45 @@ public class Main extends Application {
         @Override
         public void run() {
             executor.execute(sprite, eventType);
+        }
+    }
+
+    private class CollisionThread extends Thread {
+        @Override
+        public void run() {
+            while (true) {
+                boolean isCollision = false;
+
+                if (sprite.getX() < 0) {
+                    stopSpriteThread();
+                    sprite.setX(0.01);
+                    isCollision = true;
+                }
+                if (sprite.getX() > spritesBoard.getWidth() - sprite.getWidth()) {
+                    stopSpriteThread();
+                    sprite.setX(spritesBoard.getWidth() - sprite.getWidth()-0.01);
+                    isCollision = true;
+                }
+                if (sprite.getY() < spritesBoard.getLayoutY()) {
+                    stopSpriteThread();
+                    sprite.setY(spritesBoard.getLayoutY()+0.01);
+                    isCollision = true;
+                }
+                if (sprite.getY() > spritesBoard.getLayoutY() + spritesBoard.getHeight() - sprite.getHeight()) {
+                    stopSpriteThread();
+                    sprite.setY(spritesBoard.getLayoutY() + spritesBoard.getHeight() - sprite.getHeight()-0.01);
+                    isCollision = true;
+                }
+
+                if(isCollision) {
+                    startNewSpriteThread(EventType.WALL);
+                }
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+            }
         }
     }
 }
