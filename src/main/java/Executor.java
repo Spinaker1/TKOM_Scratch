@@ -57,6 +57,10 @@ public class Executor {
         }
 
         switch (function.getFunctionType()) {
+            case GO_TO_MOUSE:
+                sprite.moveToMouse();
+                break;
+
             case GO_LEFT:
                 sprite.moveLeft(((Expression)arguments.get(0)).getValue());
                 break;
@@ -71,6 +75,22 @@ public class Executor {
 
             case GO_DOWN:
                 sprite.moveDown(((Expression)arguments.get(0)).getValue());
+                break;
+
+            case ROTATE_LEFT:
+                sprite.rotateLeft(((Expression)arguments.get(0)).getValue());
+                break;
+
+            case ROTATE_RIGHT:
+                sprite.rotateRight(((Expression)arguments.get(0)).getValue());
+                break;
+
+            case CHANGE_SIZE:
+                sprite.changeSize((((Expression)arguments.get(0)).getValue()));
+                break;
+
+            case CHANGE_COLOR:
+                Expression[] argumentsArray = (Expression[]) arguments.toArray();
                 break;
 
             case TALK:

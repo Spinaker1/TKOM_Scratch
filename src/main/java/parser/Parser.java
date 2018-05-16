@@ -32,6 +32,8 @@ public class Parser {
 
         currentToken = token;
 
+        System.out.println(token.getTokenType());
+
         return token;
     }
 
@@ -220,6 +222,8 @@ public class Parser {
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
             throw new Exception();
+
+        getToken();
 
         return new RepeatIfStatement(codeBlock, condition);
     }

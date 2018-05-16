@@ -25,6 +25,7 @@ public class Sprite extends ImageView {
     private Stage stage;
     private final int MOVE_STEP = 5; //pixels
     private final int FRAME_DURATION = 40; //ms
+    private final int ROTATION_DEGREE = 5; //degrees
 
     public Sprite(Stage stage) {
         this.stage = stage;
@@ -47,11 +48,39 @@ public class Sprite extends ImageView {
     }
 
     public void rotateLeft(double degrees) {
-        setRotate(getRotate() - degrees);
+        setRotate(getRotate()-((int)degrees)%ROTATION_DEGREE);
+
+        final int frames = (int) (degrees/ROTATION_DEGREE);
+
+        final Timeline timeline = new Timeline(
+                new KeyFrame(
+                        Duration.millis(FRAME_DURATION),
+                        event -> setRotate(getRotate()-ROTATION_DEGREE)
+        ));
+        timeline.setCycleCount(frames);
+        timeline.play();
+
+        try {
+            Thread.sleep(frames*FRAME_DURATION);
+        } catch (InterruptedException e) {}
     }
 
     public void rotateRight(double degrees) {
-        setRotate(getRotate() + degrees);
+        setRotate(getRotate()+((int)degrees)%ROTATION_DEGREE);
+
+        final int frames = (int) (degrees/ROTATION_DEGREE);
+
+        final Timeline timeline = new Timeline(
+                new KeyFrame(
+                        Duration.millis(FRAME_DURATION),
+                        event -> setRotate(getRotate()+ROTATION_DEGREE)
+                ));
+        timeline.setCycleCount(frames);
+        timeline.play();
+
+        try {
+            Thread.sleep(frames*FRAME_DURATION);
+        } catch (InterruptedException e) {}
     }
 
     public void moveLeft(double pixels) {
@@ -62,9 +91,8 @@ public class Sprite extends ImageView {
         final Timeline timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
-                        event -> {
-                            setX(getX()-MOVE_STEP);
-                        })
+                        event ->
+                            setX(getX()-MOVE_STEP))
         );
         timeline.setCycleCount(frames);
         timeline.play();
@@ -82,9 +110,7 @@ public class Sprite extends ImageView {
         final Timeline timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
-                        event -> {
-                            setX(getX()+MOVE_STEP);
-                        })
+                        event -> setX(getX()+MOVE_STEP))
         );
         timeline.setCycleCount(frames);
         timeline.play();
@@ -102,9 +128,7 @@ public class Sprite extends ImageView {
         final Timeline timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
-                        event -> {
-                            setY(getY()+MOVE_STEP);
-                        })
+                        event -> setY(getY()+MOVE_STEP))
         );
         timeline.setCycleCount(frames);
         timeline.play();
@@ -122,9 +146,7 @@ public class Sprite extends ImageView {
         final Timeline timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
-                        event -> {
-                            setY(getY()-MOVE_STEP);
-                        })
+                        event -> setY(getY()-MOVE_STEP))
         );
         timeline.setCycleCount(frames);
         timeline.play();

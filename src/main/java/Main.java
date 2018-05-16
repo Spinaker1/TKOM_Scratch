@@ -67,7 +67,7 @@ public class Main extends Application {
 
                 sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1-> {
                     myThread.stop();
-                    new MyThread(sprite,program,EventType.MOUSE).start();
+                    new MyThread(sprite,program,EventType.START).start();
                 });
 
                 errorTextArea.setText("Program skompilował się pomyślnie.");

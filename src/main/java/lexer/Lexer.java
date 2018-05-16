@@ -178,9 +178,12 @@ public class Lexer {
 
             int lineNumber = source.getLineNumber();
 
-            do {
+            while (lineNumber == source.getLineNumber()  && !isEoF())
+            {
+                System.out.println(source.getCurrentChar());
                 source.next();
-            } while (lineNumber == source.getLineNumber()  && !isEoF());
+            }
+            source.next();
         }
 
         return isComment;
