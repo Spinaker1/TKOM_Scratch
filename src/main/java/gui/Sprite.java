@@ -200,4 +200,10 @@ public class Sprite extends ImageView {
         pause.setOnFinished(e -> pane.getChildren().remove(label));
         pause.play();
     }
+
+    public void sleep(int seconds) {
+        try {
+            Thread.sleep(seconds*1000);
+        } catch (InterruptedException e) {}
+    }
 }

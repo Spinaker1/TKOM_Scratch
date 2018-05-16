@@ -25,7 +25,6 @@ public enum TokenType {
     NEGATION,
     ASSIGNMENT,
     IF,
-    ELSE,
     REPEAT,
     REPEAT_IF,
     VARIABLE,

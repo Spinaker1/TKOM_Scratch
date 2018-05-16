@@ -1,3 +1,5 @@
+package executor;
+
 import gui.Sprite;
 import node.*;
 import token.EventType;
@@ -90,7 +92,18 @@ public class Executor {
                 break;
 
             case CHANGE_COLOR:
-                Expression[] argumentsArray = (Expression[]) arguments.toArray();
+                sprite.changeColor(((Expression)arguments.get(0)).getValue(),
+                        ((Expression)arguments.get(1)).getValue(),
+                        ((Expression)arguments.get(2)).getValue());
+                break;
+
+            case WAIT:
+                sprite.sleep(((Expression)arguments.get(0)).getValue());
+                break;
+
+            case GO:
+                sprite.move(((Expression)arguments.get(0)).getValue(),
+                        ((Expression)arguments.get(1)).getValue());
                 break;
 
             case TALK:

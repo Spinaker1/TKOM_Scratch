@@ -199,13 +199,7 @@ public class Parser {
         if ((codeBlock = parseBlock()) == null)
             throw new Exception();
 
-        Block elseCodeBlock = null;
-        if (checkTokenType(getToken(), TokenType.ELSE)) {
-            if ((elseCodeBlock = parseBlock()) == null)
-                throw new Exception();
-        }
-
-        return new IfStatement(codeBlock, elseCodeBlock, condition);
+        return new IfStatement(codeBlock, condition);
     }
 
     private RepeatIfStatement parseRepeatIfStatement() throws Exception {

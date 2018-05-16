@@ -422,21 +422,6 @@ public class LexerTest {
     }
 
     @Test
-    public void shouldParseElseKeyword() {
-        try {
-            String value = "inaczej";
-            Lexer lexer = new Lexer(new InputManager(value));
-
-            Token token = lexer.getNextToken();
-
-            assertEquals(TokenType.ELSE, token.getTokenType());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-    }
-
-    @Test
     public void shouldParseRepeatKeyword() {
         try {
             String value = "powtorz";

@@ -1,9 +1,7 @@
+import executor.Executor;
 import gui.*;
 import input.InputManager;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -11,13 +9,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import lexer.Lexer;
-import node.Assignment;
 import node.Program;
 import parser.Parser;
 import semantic.SemanticParser;
 import token.EventType;
-
-import javax.swing.*;
 
 
 public class Main extends Application {

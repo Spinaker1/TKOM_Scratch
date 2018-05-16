@@ -123,12 +123,6 @@ public class SemanticParser {
         block.setScope(new Scope(scope));
         checkBlock(block);
 
-        Block elseBlock = ifStatement.getElseCodeBlock();
-        if (elseBlock != null) {
-            elseBlock.setScope(scope);
-            checkBlock(elseBlock);
-        }
-
         checkCondition(ifStatement.getCondition(), scope);
     }
 
