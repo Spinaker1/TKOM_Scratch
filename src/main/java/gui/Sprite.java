@@ -1,13 +1,10 @@
 package gui;
 
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
@@ -16,16 +13,20 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import node.Program;
 
-import java.awt.Point;
-import java.awt.MouseInfo;
-import java.util.concurrent.TimeUnit;
+import java.awt.*;
 
 public class Sprite extends ImageView {
     private Stage stage;
+
+    private Program program = null;
+
     private final int MOVE_STEP = 5; //pixels
     private final int FRAME_DURATION = 40; //ms
     private final int ROTATION_DEGREE = 5; //degrees
+
+    private Timeline timeline;
 
     public Sprite(Stage stage) {
         this.stage = stage;
@@ -52,7 +53,7 @@ public class Sprite extends ImageView {
 
         final int frames = (int) (degrees/ROTATION_DEGREE);
 
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
                         event -> setRotate(getRotate()-ROTATION_DEGREE)
@@ -70,7 +71,7 @@ public class Sprite extends ImageView {
 
         final int frames = (int) (degrees/ROTATION_DEGREE);
 
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
                         event -> setRotate(getRotate()+ROTATION_DEGREE)
@@ -88,7 +89,7 @@ public class Sprite extends ImageView {
 
         final int frames = (int) (pixels/MOVE_STEP);
 
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
                         event ->
@@ -107,7 +108,7 @@ public class Sprite extends ImageView {
 
         final int frames = (int) (pixels/MOVE_STEP);
 
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
                         event -> setX(getX()+MOVE_STEP))
@@ -125,7 +126,7 @@ public class Sprite extends ImageView {
 
         final int frames = (int) (pixels/MOVE_STEP);
 
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
                         event -> setY(getY()+MOVE_STEP))
@@ -143,7 +144,7 @@ public class Sprite extends ImageView {
 
         final int frames = (int) (pixels/MOVE_STEP);
 
-        final Timeline timeline = new Timeline(
+        timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(FRAME_DURATION),
                         event -> setY(getY()-MOVE_STEP))
@@ -172,8 +173,6 @@ public class Sprite extends ImageView {
         double rx = ((double) r) / 255;
         double gx = ((double) g) / 255;
         double bx = ((double) b) / 255;
-
-        System.out.println(rx);
 
         lighting.setLight(new Light.Distant(45, 45, new Color(rx, gx, bx, 1.00)));
 
@@ -205,5 +204,19 @@ public class Sprite extends ImageView {
         try {
             Thread.sleep(seconds*1000);
         } catch (InterruptedException e) {}
+    }
+
+    public Program getProgram() {
+        return program;
+    }
+
+    public void setProgram(Program program) {
+        this.program = program;
+    }
+
+    public void stopTimeLine() {
+        if (timeline != null) {
+            timeline.stop();
+        }
     }
 }

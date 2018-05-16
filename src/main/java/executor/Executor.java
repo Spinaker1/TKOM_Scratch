@@ -9,8 +9,13 @@ import java.util.LinkedList;
 public class Executor {
     private Sprite sprite;
 
-    public void execute(Sprite sprite, Program program, EventType eventType)  {
+    public void execute(Sprite sprite, EventType eventType)  {
         this.sprite = sprite;
+
+        Program program;
+        if ((program = sprite.getProgram()) == null) {
+            return;
+        }
 
         for (Event event : program.getEvents()) {
             if (event.getEventType() == eventType) {

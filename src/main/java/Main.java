@@ -14,10 +14,25 @@ import parser.Parser;
 import semantic.SemanticParser;
 import token.EventType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class Main extends Application {
     private final int WIDTH = 1000;
     private final int HEIGHT = 600;
+
+    private Map<Sprite, SpriteThread> spriteThreadsHashMap = new HashMap<>();
+
+    private Sprite sprite;
+
+    private InputManager source = new InputManager();
+    private Lexer lexer = new Lexer(source);
+    private Parser parser = new Parser(lexer);
+    private SemanticParser semanticParser = new SemanticParser();
+
+    private TextArea consoleTextArea = new ConsoleTextArea(WIDTH, HEIGHT);
+    private TextArea errorTextArea = new ErrorTextArea(WIDTH, HEIGHT);
 
     public static void main(String[] args) {
         launch(args);
@@ -31,24 +46,30 @@ public class Main extends Application {
         Pane root = new Pane();
         Scene scene = new Scene(root, WIDTH, HEIGHT);
 
-        Sprite sprite = new Sprite(primaryStage);
+        sprite = new Sprite(primaryStage);
         SpritesBoard spritesBoard = new SpritesBoard(sprite);
         root.getChildren().add(spritesBoard);
 
-        TextArea consoleTextArea = new ConsoleTextArea(WIDTH, HEIGHT);
         root.getChildren().add(consoleTextArea);
-
-        TextArea errorTextArea = new ErrorTextArea(WIDTH,HEIGHT);
         root.getChildren().add(errorTextArea);
 
+        HBox hBox = new HBox();
+
         Button button = new Button("Kompiluj");
-        root.getChildren().add(button);
+        setupCompileButton(button);
 
-        InputManager source = new InputManager();
-        Lexer lexer = new Lexer(source);
-        Parser parser = new Parser(lexer);
-        SemanticParser semanticParser = new SemanticParser();
+        Button button1 = new Button("Wykonaj");
+        setupExecuteButton(button1);
 
+        hBox.getChildren().addAll(button, button1);
+        root.getChildren().add(hBox);
+
+        primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.show();
+    }
+
+    private void setupCompileButton(Button button) {
         button.setOnAction(e -> {
             try {
                 errorTextArea.setText("");
@@ -57,13 +78,7 @@ public class Main extends Application {
                 Program program = parser.parse();
                 semanticParser.check(program);
 
-                MyThread myThread = new MyThread(sprite,program,EventType.START);
-                myThread.start();
-
-                sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1-> {
-                    myThread.stop();
-                    new MyThread(sprite,program,EventType.START).start();
-                });
+                sprite.setProgram(program);
 
                 errorTextArea.setText("Program skompilował się pomyślnie.");
             } catch (Exception exc) {
@@ -75,33 +90,46 @@ public class Main extends Application {
                 consoleTextArea.positionCaret(source.getPositionInFile());
             }
         });
-
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.show();
     }
 
-    private class MyThread extends Thread {
+    private void setupExecuteButton(Button button) {
+        button.setOnAction(e -> {
+            SpriteThread spriteThread = new SpriteThread(sprite, EventType.START);
+            spriteThreadsHashMap.put(sprite,spriteThread);
+            spriteThread.start();
+
+            sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1 -> {
+                sprite.stopTimeLine();
+                
+                if (spriteThreadsHashMap.containsKey(sprite)) {
+                    SpriteThread spriteThreadToDelete = spriteThreadsHashMap.get(sprite);
+                    spriteThreadsHashMap.remove(sprite);
+                    spriteThreadToDelete.stop();
+                }
+
+                SpriteThread mouseSpriteThread = new SpriteThread(sprite, EventType.MOUSE);
+                spriteThreadsHashMap.put(sprite,mouseSpriteThread);
+                mouseSpriteThread.start();
+            });
+
+        });
+    }
+
+    private class SpriteThread extends Thread {
         private Sprite sprite;
-        private Program program;
         private Executor executor;
         private EventType eventType;
 
-        MyThread(Sprite sprite, Program program, EventType eventType) {
+        SpriteThread(Sprite sprite, EventType eventType) {
             super();
             this.eventType = eventType;
             this.sprite = sprite;
-            this.program = program;
             this.executor = new Executor();
-        }
-
-        void setEventType(EventType eventType) {
-            this.eventType = eventType;
         }
 
         @Override
         public void run() {
-            executor.execute(sprite, program, eventType);
+            executor.execute(sprite, eventType);
         }
     }
 }
