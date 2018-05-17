@@ -121,6 +121,7 @@ public class Executor {
                     StringLiteral stringLiteral = (StringLiteral) arguments.get(0);
                     value = stringLiteral.getValue();
                 }
+                /*
                 if (arguments.get(0).getNodeType() == NodeType.EXPRESSION) {
                     Assignable assignable = arguments.get(0);
                     while (assignable.getNodeType() == NodeType.EXPRESSION) {
@@ -131,6 +132,7 @@ public class Executor {
                     variable = scope.getVariable(variable.getName());
                     value = variable.getStringValue();
                 }
+                */
                 sprite.talk(value);
                 break;
         }

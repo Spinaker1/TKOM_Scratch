@@ -17,4 +17,8 @@ public class Assignment extends Node {
     public Assignable getValue() {
         return value;
     }
+
+    public void setValue(Assignable value) {
+        this.value = value;
+    }
 }

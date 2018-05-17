@@ -92,7 +92,9 @@ public class SemanticParser {
                 if (argument.getNodeType() == NodeType.STRING_LITERAL) {
                     return;
                 } else {
-                    if (checkStringVariable(argument, scope)) {
+                    String value;
+                    if ((value = checkStringVariable(argument, scope)) != null) {
+                        function.getArguments().set(i,new StringLiteral(value));
                         return;
                     } else {
                         throw new Exception("Argument powinien zawierać napis.");
@@ -128,13 +130,19 @@ public class SemanticParser {
 
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
             variable.setVariableType(VariableType.STRING);
+            variable.setStringValue(((StringLiteral)assignable).getValue());
         } else {
             Expression expression = (Expression) assignable;
-            checkAssignable(expression, scope);
-            variable.setVariableType(VariableType.INT);
+            String value;
+            if ((value = checkStringVariable(expression, scope)) != null) {
+                assignment.setValue(new StringLiteral(value));
+                variable.setVariableType(VariableType.STRING);
+                variable.setStringValue(value);
+            } else {
+                checkAssignable(expression, scope);
+                variable.setVariableType(VariableType.INT);
+            }
         }
-
-
     }
 
     private void checkIfStatement(IfStatement ifStatement, Scope scope) throws Exception {
@@ -205,30 +213,30 @@ public class SemanticParser {
         }
     }
 
-    private boolean checkStringVariable(Assignable assignable, Scope scope) {
+    private String checkStringVariable(Assignable assignable, Scope scope) {
         while (assignable.getNodeType() == NodeType.EXPRESSION) {
             LinkedList<Operand> operands = ((Expression) assignable).getOperands();
             if (operands.size() != 1) {
-                return false;
+                return null;
             }
             assignable = operands.get(0);
         }
 
         if (assignable.getNodeType() != NodeType.VARIABLE) {
-            return false;
+            return null;
         }
 
         Variable variable = (Variable) assignable;
         if (!scope.containsVariable(variable.getName())) {
-            return false;
+            return null;
         }
 
         variable = scope.getVariable(variable.getName());
         if (variable.getVariableType() != VariableType.STRING) {
-            return false;
+            return null;
         }
 
-        return true;
+        return variable.getStringValue();
     }
 }
 

@@ -77,4 +77,48 @@ public class SemanticParserTest {
             assertEquals("Argument powinien zawierać liczbę całkowitą.", e.getMessage());
         }
     }
+
+    @Test
+    public void shouldThrowExceptionWhenFunctionHasStringVariableArgumentInsteadOfInt() {
+        try {
+            String text = "START() { " +
+                    "a = \"kwiatek\";" +
+                    "obrocPrawo(a); }";
+            Parser parser = new Parser(new Lexer(new InputManager(text)));
+            Program program = parser.parse();
+            new SemanticParser().check(program);
+            fail();
+        } catch (Exception e) {
+            assertEquals("Zmienna musi zawierać liczbę całkowitą.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenFunctionHasIntArgumentInsteadOfString() {
+        try {
+            String text = "START() {" +
+                    "powiedz(2);}";
+            Parser parser = new Parser(new Lexer(new InputManager(text)));
+            Program program = parser.parse();
+            new SemanticParser().check(program);
+            fail();
+        } catch (Exception e) {
+            assertEquals("Argument powinien zawierać napis.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenFunctionHasIntVariableArgumentInsteadOfString() {
+        try {
+            String text = "START() {" +
+                    "x=2;" +
+                    "powiedz(x);}";
+            Parser parser = new Parser(new Lexer(new InputManager(text)));
+            Program program = parser.parse();
+            new SemanticParser().check(program);
+            fail();
+        } catch (Exception e) {
+            assertEquals("Argument powinien zawierać napis.", e.getMessage());
+        }
+    }
 }
