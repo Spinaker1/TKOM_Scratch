@@ -2,8 +2,10 @@ package executor;
 
 import gui.Sprite;
 import node.*;
+import node.Event;
 import token.EventType;
 
+import java.awt.*;
 import java.util.LinkedList;
 
 public class Executor {
@@ -43,11 +45,11 @@ public class Executor {
                     break;
 
                 case IF_STATEMENT:
-                    executeIfStatement((IfStatement) instruction);
+                    executeIfStatement((IfStatement) instruction, scope);
                     break;
 
                 case REPEAT_IF_STATEMENT:
-                    executeRepeatIfStatement((RepeatIfStatement) instruction);
+                    executeRepeatIfStatement((RepeatIfStatement) instruction, scope);
                     break;
 
                 case REPEAT_STATEMENT:
@@ -114,9 +116,21 @@ public class Executor {
                 break;
 
             case TALK:
-                String value;
-                StringLiteral stringLiteral = (StringLiteral) arguments.get(0);
-                value = stringLiteral.getValue();
+                String value="";
+                if (arguments.get(0).getNodeType() == NodeType.STRING_LITERAL) {
+                    StringLiteral stringLiteral = (StringLiteral) arguments.get(0);
+                    value = stringLiteral.getValue();
+                }
+                if (arguments.get(0).getNodeType() == NodeType.EXPRESSION) {
+                    Assignable assignable = arguments.get(0);
+                    while (assignable.getNodeType() == NodeType.EXPRESSION) {
+                        LinkedList<Operand> operands = ((Expression) assignable).getOperands();
+                        assignable = operands.get(0);
+                    }
+                    Variable variable = (Variable) assignable;
+                    variable = scope.getVariable(variable.getName());
+                    value = variable.getStringValue();
+                }
                 sprite.talk(value);
                 break;
         }
@@ -128,17 +142,23 @@ public class Executor {
         Variable variable = scope.getVariable(assignment.getVariable().getName());
 
         if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
-
+            StringLiteral stringLiteral = (StringLiteral) assignable;
+            variable.setVariableType(VariableType.STRING);
+            variable.setStringValue(stringLiteral.getValue());
         }
         else {
             Expression expression = (Expression) assignable;
             variable.setIntValue(executeAssignable(expression,scope));
+            variable.setVariableType(VariableType.INT);
             System.out.println(variable.getIntValue());
         }
     }
 
-    private void executeIfStatement(IfStatement ifStatement)  {
-
+    private void executeIfStatement(IfStatement ifStatement, Scope scope)  {
+        boolean result = executeCondition(ifStatement.getCondition(), scope);
+        if (result) {
+            executeBlock(ifStatement.getCodeBlock());
+        }
     }
 
     private void executeRepeatStatement(RepeatStatement repeatStatement)  {
@@ -149,8 +169,10 @@ public class Executor {
         }
     }
 
-    private void executeRepeatIfStatement(RepeatIfStatement repeatIfStatement)  {
-
+    private void executeRepeatIfStatement(RepeatIfStatement repeatIfStatement, Scope scope)  {
+        while (executeCondition(repeatIfStatement.getCondition(),scope)) {
+            executeBlock(repeatIfStatement.getCodeBlock());
+        }
     }
 
     private int executeAssignable(Assignable assignable, Scope scope)  {
@@ -215,5 +237,43 @@ public class Executor {
 
         expression.setValue(value);
         return value;
+    }
+
+    private boolean executeCondition(Condition condition, Scope scope) {
+        System.out.println("condition");
+
+        if (condition.getOperators().size() == 0) {
+            return executeCondition((Condition) condition.getOperands().get(0), scope);
+        }
+
+        int x1 = 0;
+        int x2 = 0;
+        switch (condition.getOperators().get(0)) {
+            case EQUAL:
+            case NOT_EQUAL:
+            case GREATER:
+            case GREATER_EQUAL:
+            case LESS:
+            case LESS_EQUAL:
+                x1 = executeExpression((Expression) condition.getOperands().get(0), scope);
+                x2 = executeExpression((Expression) condition.getOperands().get(1), scope);
+        }
+
+        switch (condition.getOperators().get(0)) {
+            case EQUAL:
+                return x1 == x2;
+            case NOT_EQUAL:
+                return x1 != x2;
+            case LESS:
+                return x1 < x2;
+            case LESS_EQUAL:
+                return x1 <= x2;
+            case GREATER:
+                return x1 > x2;
+            case GREATER_EQUAL:
+                return x1 >= x2;
+        }
+
+        return true;
     }
 }

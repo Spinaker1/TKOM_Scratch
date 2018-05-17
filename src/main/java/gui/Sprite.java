@@ -188,7 +188,7 @@ public class Sprite extends ImageView {
 
         Label label = new Label(text);
         label.setLayoutX(this.getX() + getWidth());
-        label.setLayoutY(this.getY());
+        label.setLayoutY(this.getY() - getHeight() * 0.3);
         label.setStyle(css);
 
         Pane pane = (Pane) getParent().getParent();

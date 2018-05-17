@@ -207,6 +207,7 @@ public class Parser {
 
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
+        getToken();
         Condition condition = parseCondition();
 
         accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
@@ -214,8 +215,6 @@ public class Parser {
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
             throw new Exception();
-
-        getToken();
 
         return new RepeatIfStatement(codeBlock, condition);
     }
@@ -252,7 +251,7 @@ public class Parser {
         LinkedList<Node> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
-        operands.add(parsePrimaryCondition());
+        operands.add(parseAdditiveExpression());
         if (checkTokenType(currentToken,TokenType.EQUAL) ||
                 checkTokenType(currentToken, TokenType.NOT_EQUAL) ||
                 checkTokenType(currentToken, TokenType.LESS) ||
@@ -262,20 +261,11 @@ public class Parser {
                 ) {
             operators.add(currentToken.getTokenType());
             getToken();
-            operands.add(parsePrimaryCondition());
+            operands.add(parseAdditiveExpression());
         }
         else {
-            throw new Exception();
+            throw new Exception("Oczekiwany operator porównania.");
         }
-
-        return new Condition(operators,operands);
-    }
-
-    private Condition parsePrimaryCondition() throws Exception {
-        LinkedList<Node> operands = new LinkedList<>();
-        LinkedList<TokenType> operators = new LinkedList<>();
-
-        operands.add(parseAdditiveExpression());
 
         return new Condition(operators,operands);
     }
