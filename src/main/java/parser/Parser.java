@@ -189,7 +189,7 @@ public class Parser {
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         getToken();
-        Condition condition = parseCondition();
+        Expression condition = parseCondition();
 
         accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
@@ -208,7 +208,7 @@ public class Parser {
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
 
         getToken();
-        Condition condition = parseCondition();
+        Expression condition = parseCondition();
 
         accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
@@ -219,8 +219,8 @@ public class Parser {
         return new RepeatIfStatement(codeBlock, condition);
     }
 
-    private Condition parseCondition() throws Exception {
-        LinkedList<Node> operands = new LinkedList<>();
+    private Expression parseCondition() throws Exception {
+        LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
         operands.add(parseAndCondition());
@@ -230,11 +230,11 @@ public class Parser {
             operands.add(parseAndCondition());
         }
 
-        return new Condition(operators,operands);
+        return new Expression(operators,operands);
     }
 
-    private Condition parseAndCondition() throws Exception {
-        LinkedList<Node> operands = new LinkedList<>();
+    private Expression parseAndCondition() throws Exception {
+        LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
         operands.add(parseRelationalCondition());
@@ -244,11 +244,11 @@ public class Parser {
             operands.add(parseRelationalCondition());
         }
 
-        return new Condition(operators,operands);
+        return new Expression(operators,operands);
     }
 
-    private Condition parseRelationalCondition() throws Exception {
-        LinkedList<Node> operands = new LinkedList<>();
+    private Expression parseRelationalCondition() throws Exception {
+        LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
         operands.add(parseAdditiveExpression());
@@ -267,7 +267,7 @@ public class Parser {
             throw new Exception("Oczekiwany operator porównania.");
         }
 
-        return new Condition(operators,operands);
+        return new Expression(operators,operands);
     }
 
     private Expression parseAdditiveExpression() throws Exception {

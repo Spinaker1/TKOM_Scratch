@@ -227,9 +227,9 @@ public class Executor {
         return value;
     }
 
-    private boolean executeCondition(Condition condition, Scope scope) {
+    private boolean executeCondition(Expression condition, Scope scope) {
         if (condition.getOperators().size() == 0) {
-            return executeCondition((Condition) condition.getOperands().get(0), scope);
+            return executeCondition((Expression) condition.getOperands().get(0), scope);
         }
 
         int x1 = 0;
@@ -260,7 +260,7 @@ public class Executor {
                 return x1 >= x2;
             case OR:
                 for (Node node: condition.getOperands()) {
-                    Condition condition1 = (Condition) node;
+                    Expression condition1 = (Expression) node;
                     if (executeCondition(condition1,scope)) {
                         return true;
                     }
@@ -269,7 +269,7 @@ public class Executor {
 
             case AND:
                 for (Node node: condition.getOperands()) {
-                    Condition condition1 = (Condition) node;
+                    Expression condition1 = (Expression) node;
                     if (!executeCondition(condition1,scope)) {
                         return false;
                     }

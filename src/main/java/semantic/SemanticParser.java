@@ -201,10 +201,10 @@ public class SemanticParser {
         }
     }
 
-    private void checkCondition(Condition condition, Scope scope) throws Exception {
+    private void checkCondition(Expression condition, Scope scope) throws Exception {
         for (Node operand : condition.getOperands()) {
             if (operand.getNodeType() == NodeType.CONDITION) {
-                Condition condition1 = (Condition) operand;
+                Expression condition1 = (Expression) operand;
                 checkCondition(condition1, scope);
             } else if (operand.getNodeType() == NodeType.EXPRESSION) {
                 Expression expression = (Expression) operand;

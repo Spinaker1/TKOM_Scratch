@@ -265,15 +265,15 @@ public class ParserTest {
             Event event = program.getEvents().get(0);
             Block block = event.getCodeBlock();
             IfStatement ifStatement = (IfStatement) block.getInstructions().get(0);
-            Condition orCond = ifStatement.getCondition();
-            Condition andCond = (Condition) orCond.getOperands().get(0);
-            Condition relCond = (Condition) andCond.getOperands().get(0);
-            Condition priCond = (Condition) relCond.getOperands().get(0);
+            Expression orCond = ifStatement.getCondition();
+            Expression andCond = (Expression) orCond.getOperands().get(0);
+            Expression relCond = (Expression) andCond.getOperands().get(0);
+            Expression priCond = (Expression) relCond.getOperands().get(0);
             Expression addExpr = (Expression) priCond.getOperands().get(0);
             Expression mulExpr = (Expression) addExpr.getOperands().get(0);
             IntLiteral int1 = (IntLiteral) mulExpr.getOperands().get(0);
 
-            Condition priCond2 = (Condition) relCond.getOperands().get(1);
+            Expression priCond2 = (Expression) relCond.getOperands().get(1);
             Expression addExpr2 = (Expression) priCond2.getOperands().get(0);
             Expression mulExpr2 = (Expression) addExpr2.getOperands().get(0);
             Variable var1 = (Variable) mulExpr2.getOperands().get(0);
@@ -281,14 +281,14 @@ public class ParserTest {
             Expression mulExpr3 = (Expression) addExpr2.getOperands().get(1);
             IntLiteral int2 = (IntLiteral) mulExpr3.getOperands().get(0);
 
-            Condition andCond1 = (Condition) orCond.getOperands().get(1);
-            Condition relCond2 = (Condition) andCond1.getOperands().get(0);
-            Condition priCond3 = (Condition) relCond2.getOperands().get(0);
+            Expression andCond1 = (Expression) orCond.getOperands().get(1);
+            Expression relCond2 = (Expression) andCond1.getOperands().get(0);
+            Expression priCond3 = (Expression) relCond2.getOperands().get(0);
             Expression addExpr3 = (Expression) priCond3.getOperands().get(0);
             Expression mulExpr4 = (Expression) addExpr3.getOperands().get(0);
             Variable var2 = (Variable) mulExpr4.getOperands().get(0);
 
-            Condition priCond4 = (Condition) relCond2.getOperands().get(1);
+            Expression priCond4 = (Expression) relCond2.getOperands().get(1);
             Expression addExpr4 = (Expression) priCond4.getOperands().get(0);
             Expression mulExpr5 = (Expression) addExpr4.getOperands().get(0);
             IntLiteral int3 = (IntLiteral) mulExpr5.getOperands().get(0);

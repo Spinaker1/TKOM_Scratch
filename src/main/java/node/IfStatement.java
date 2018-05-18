@@ -2,9 +2,9 @@ package node;
 
 public class IfStatement extends Node {
     private Block codeBlock;
-    private Condition condition;
+    private Expression condition;
 
-    public IfStatement(Block codeBlock, Condition condition) {
+    public IfStatement(Block codeBlock, Expression condition) {
         this.codeBlock = codeBlock;
         this.condition = condition;
         this.nodeType = NodeType.IF_STATEMENT;
@@ -14,7 +14,7 @@ public class IfStatement extends Node {
         return codeBlock;
     }
 
-    public Condition getCondition() {
+    public Expression getCondition() {
         return condition;
     }
 }

@@ -2,9 +2,9 @@ package node;
 
 public class RepeatIfStatement extends Node {
     private Block codeBlock;
-    private Condition condition;
+    private Expression condition;
 
-    public RepeatIfStatement(Block codeBlock, Condition condition) {
+    public RepeatIfStatement(Block codeBlock, Expression condition) {
         this.codeBlock = codeBlock;
         this.condition = condition;
         this.nodeType = NodeType.REPEAT_IF_STATEMENT;
@@ -14,7 +14,7 @@ public class RepeatIfStatement extends Node {
         return codeBlock;
     }
 
-    public Condition getCondition() {
+    public Expression getCondition() {
         return condition;
     }
 }
