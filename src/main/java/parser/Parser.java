@@ -2,7 +2,10 @@ package parser;
 
 import lexer.Lexer;
 import node.*;
-import token.*;
+import token.EventType;
+import token.FunctionType;
+import token.Token;
+import token.TokenType;
 
 import java.util.LinkedList;
 
@@ -186,12 +189,12 @@ public class Parser {
             return null;
         }
 
-        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
+        accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: (");
 
         getToken();
         Expression condition = parseCondition();
 
-        accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
+        accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: )");
 
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
@@ -205,12 +208,12 @@ public class Parser {
             return null;
         }
 
-        accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
+        accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: (");
 
         getToken();
         Expression condition = parseCondition();
 
-        accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
+        accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: )");
 
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
@@ -220,6 +223,7 @@ public class Parser {
     }
 
     private Expression parseCondition() throws Exception {
+        System.out.println("or");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
@@ -234,6 +238,7 @@ public class Parser {
     }
 
     private Expression parseAndCondition() throws Exception {
+        System.out.println("and");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
@@ -248,6 +253,29 @@ public class Parser {
     }
 
     private Expression parseRelationalCondition() throws Exception {
+        if (checkTokenType(currentToken,TokenType.SQUARE_BRACKET_OPEN)) {
+            getToken();
+            Expression condition = parseCondition();
+            accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE,"");
+            getToken();
+
+            return condition;
+        }
+
+
+        if (checkTokenType(currentToken,TokenType.NEGATION)) {
+            accept(getToken(), TokenType.SQUARE_BRACKET_OPEN,"");
+            getToken();
+            Expression condition = parseCondition();
+            accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE,"");
+            getToken();
+
+            condition.setNegated(true);
+            return condition;
+        }
+
+
+        System.out.println("relational");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
@@ -271,6 +299,7 @@ public class Parser {
     }
 
     private Expression parseAdditiveExpression() throws Exception {
+        System.out.println("add");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
@@ -286,6 +315,7 @@ public class Parser {
     }
 
     private Expression parseMultiplicativeExpression() throws Exception {
+        System.out.println("mul");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
@@ -301,6 +331,7 @@ public class Parser {
     }
 
     private Operand parsePrimaryExpression() throws Exception {
+        System.out.println("pri");
         switch(currentToken.getTokenType()) {
             case VARIABLE:
                 return parseVariable();
@@ -316,8 +347,7 @@ public class Parser {
                 getToken();
 
                 Operand expression = parseAdditiveExpression();
-                if (!checkTokenType(currentToken,TokenType.PARENTHESIS_CLOSE))
-                    throw new Exception();
+                accept(currentToken,TokenType.PARENTHESIS_CLOSE,"");
 
                 return expression;
 

@@ -7,6 +7,7 @@ import token.EventType;
 
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.concurrent.locks.Condition;
 
 public class Executor {
     private Sprite sprite;
@@ -229,7 +230,7 @@ public class Executor {
 
     private boolean executeCondition(Expression condition, Scope scope) {
         if (condition.getOperators().size() == 0) {
-            return executeCondition((Expression) condition.getOperands().get(0), scope);
+            return executeCondition((Expression) condition.getOperands().get(0), scope) ^ condition.isNegated();
         }
 
         int x1 = 0;
@@ -247,34 +248,34 @@ public class Executor {
 
         switch (condition.getOperators().get(0)) {
             case EQUAL:
-                return x1 == x2;
+                return (x1 == x2) ^ condition.isNegated();
             case NOT_EQUAL:
-                return x1 != x2;
+                return (x1 != x2) ^ condition.isNegated();
             case LESS:
-                return x1 < x2;
+                return x1 < x2 ^ condition.isNegated();
             case LESS_EQUAL:
-                return x1 <= x2;
+                return x1 <= x2 ^ condition.isNegated();
             case GREATER:
-                return x1 > x2;
+                return x1 > x2 ^ condition.isNegated();
             case GREATER_EQUAL:
-                return x1 >= x2;
+                return x1 >= x2 ^ condition.isNegated();
             case OR:
                 for (Node node: condition.getOperands()) {
                     Expression condition1 = (Expression) node;
                     if (executeCondition(condition1,scope)) {
-                        return true;
+                        return !condition.isNegated();
                     }
                 }
-                return false;
+                return condition.isNegated();
 
             case AND:
                 for (Node node: condition.getOperands()) {
                     Expression condition1 = (Expression) node;
                     if (!executeCondition(condition1,scope)) {
-                        return false;
+                        return condition.isNegated();
                     }
                 }
-                return true;
+                return !condition.isNegated();
         }
 
         return true;

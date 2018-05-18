@@ -77,7 +77,7 @@ public class ParserTest {
     public void shouldParseIfStatementAndFunction() {
         try {
             Parser parser = new Parser(new Lexer(new InputManager("KOLIZJA(auto) { " +
-                    "jezeli(1+2*3 != 5 && 3 < 5 || y+2+3 > k*s) { " +
+                    "jezeli[1+2*3 != 5 && 3 < 5 || y+2+3 > k*s] { " +
                     "idzLewo(10); " +
                     "} " +
                     "}")));
@@ -258,8 +258,7 @@ public class ParserTest {
     @Test
     public void ShouldParseIfStatementWithAndOperator() {
         try {
-            StringBuilder builder = new StringBuilder(" START() { jezeli (4 == y+1 || w < 5) {}  }");
-            Parser parser = new Parser(new Lexer(new InputManager(builder.toString())));
+            Parser parser = new Parser(new Lexer(new InputManager(" START() { jezeli [4 == y+1 || w < 5] {}  }")));
 
             Program program = parser.parse();
             Event event = program.getEvents().get(0);
@@ -268,13 +267,11 @@ public class ParserTest {
             Expression orCond = ifStatement.getCondition();
             Expression andCond = (Expression) orCond.getOperands().get(0);
             Expression relCond = (Expression) andCond.getOperands().get(0);
-            Expression priCond = (Expression) relCond.getOperands().get(0);
-            Expression addExpr = (Expression) priCond.getOperands().get(0);
+            Expression addExpr = (Expression) relCond.getOperands().get(0);
             Expression mulExpr = (Expression) addExpr.getOperands().get(0);
             IntLiteral int1 = (IntLiteral) mulExpr.getOperands().get(0);
 
-            Expression priCond2 = (Expression) relCond.getOperands().get(1);
-            Expression addExpr2 = (Expression) priCond2.getOperands().get(0);
+            Expression addExpr2 = (Expression) relCond.getOperands().get(1);
             Expression mulExpr2 = (Expression) addExpr2.getOperands().get(0);
             Variable var1 = (Variable) mulExpr2.getOperands().get(0);
 
@@ -283,13 +280,11 @@ public class ParserTest {
 
             Expression andCond1 = (Expression) orCond.getOperands().get(1);
             Expression relCond2 = (Expression) andCond1.getOperands().get(0);
-            Expression priCond3 = (Expression) relCond2.getOperands().get(0);
-            Expression addExpr3 = (Expression) priCond3.getOperands().get(0);
+            Expression addExpr3 = (Expression) relCond2.getOperands().get(0);
             Expression mulExpr4 = (Expression) addExpr3.getOperands().get(0);
             Variable var2 = (Variable) mulExpr4.getOperands().get(0);
 
-            Expression priCond4 = (Expression) relCond2.getOperands().get(1);
-            Expression addExpr4 = (Expression) priCond4.getOperands().get(0);
+            Expression addExpr4 = (Expression) relCond2.getOperands().get(1);
             Expression mulExpr5 = (Expression) addExpr4.getOperands().get(0);
             IntLiteral int3 = (IntLiteral) mulExpr5.getOperands().get(0);
 
@@ -301,6 +296,43 @@ public class ParserTest {
         } catch (Exception e) {
             e.printStackTrace();
             fail();
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhereThereIsNotSemicolonAfterAssignment() {
+        try {
+            String value = " START() { x = 4  }";
+            Parser parser = new Parser(new Lexer(new InputManager(value)));
+            parser.parse();
+            fail();
+        } catch (Exception e) {
+            assertEquals("Oczekiwane wyrażenie: ;",e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhereThereIsNotSemicolonAfterFunction() {
+        try {
+            String value = " START() { pobierzX()  }";
+            Parser parser = new Parser(new Lexer(new InputManager(value)));
+            parser.parse();
+            fail();
+        } catch (Exception e) {
+            assertEquals("Oczekiwane wyrażenie: ;",e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldParseRepeatIfStatement() {
+        try {
+            String value = " START() { pobierzX()  }";
+            Parser parser = new Parser(new Lexer(new InputManager(value)));
+            parser.parse();
+            fail();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertEquals("Oczekiwane wyrażenie: ;",e.getMessage());
         }
     }
 }

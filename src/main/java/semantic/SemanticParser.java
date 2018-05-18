@@ -150,7 +150,7 @@ public class SemanticParser {
         block.setScope(new Scope(scope));
         checkBlock(block);
 
-        checkCondition(ifStatement.getCondition(), scope);
+        checkAssignable(ifStatement.getCondition(), scope);
     }
 
     private void checkRepeatStatement(RepeatStatement repeatStatement, Scope scope) throws Exception {
@@ -163,7 +163,7 @@ public class SemanticParser {
         Block block = repeatIfStatement.getCodeBlock();
         block.setScope(new Scope(scope));
         checkBlock(block);
-        checkCondition(repeatIfStatement.getCondition(), scope);
+        checkAssignable(repeatIfStatement.getCondition(), scope);
     }
 
     private void checkAssignable(Assignable assignable, Scope scope) throws Exception {
@@ -198,18 +198,6 @@ public class SemanticParser {
         variable = scope.getVariable(variable.getName());
         if (variable.getVariableType() != VariableType.INT) {
             throw new Exception("Zmienna musi zawierać liczbę całkowitą.");
-        }
-    }
-
-    private void checkCondition(Expression condition, Scope scope) throws Exception {
-        for (Node operand : condition.getOperands()) {
-            if (operand.getNodeType() == NodeType.CONDITION) {
-                Expression condition1 = (Expression) operand;
-                checkCondition(condition1, scope);
-            } else if (operand.getNodeType() == NodeType.EXPRESSION) {
-                Expression expression = (Expression) operand;
-                checkAssignable(expression, scope);
-            }
         }
     }
 

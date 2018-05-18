@@ -20,6 +20,8 @@ public enum TokenType {
     PARENTHESIS_CLOSE,
     BRACKET_OPEN,
     BRACKET_CLOSE,
+    SQUARE_BRACKET_OPEN,
+    SQUARE_BRACKET_CLOSE,
     AND,
     OR,
     NEGATION,

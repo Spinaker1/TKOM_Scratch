@@ -139,6 +139,35 @@ public class LexerTest {
     }
 
     @Test
+    public void shouldParseSquareBracketOpen() {
+        try {
+            Lexer lexer = new Lexer(new InputManager("["));
+
+            Token token = lexer.getNextToken();
+
+            assertEquals(TokenType.SQUARE_BRACKET_OPEN, token.getTokenType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+
+    @Test
+    public void shouldParseSquareBracketClose() {
+        try {
+            Lexer lexer = new Lexer(new InputManager("]"));
+
+            Token token = lexer.getNextToken();
+
+            assertEquals(TokenType.SQUARE_BRACKET_CLOSE, token.getTokenType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    @Test
     public void shouldParseBracketOpen() {
         try {
             Lexer lexer = new Lexer(new InputManager("{"));

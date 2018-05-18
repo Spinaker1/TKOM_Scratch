@@ -143,6 +143,12 @@ public class Lexer {
             case ')':
                 return new Token(TokenType.PARENTHESIS_CLOSE, source);
 
+            case '[':
+                return new Token(TokenType.SQUARE_BRACKET_OPEN, source);
+
+            case ']':
+                return new Token(TokenType.SQUARE_BRACKET_CLOSE, source);
+
             case ',':
                 return new Token(TokenType.COMMA, source);
         }

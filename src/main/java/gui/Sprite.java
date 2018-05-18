@@ -55,21 +55,24 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setRotate(getRotate()-((int)degrees)%ROTATION_DEGREE);
-
-        final int frames = (int) (degrees/ROTATION_DEGREE);
-
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.millis(FRAME_DURATION),
-                        event -> setRotate(getRotate()-ROTATION_DEGREE)
-        ));
-        timeline.setCycleCount(frames);
-        timeline.play();
+        setRotate(getRotate() - ((int) degrees) % ROTATION_DEGREE);
 
         try {
-            Thread.sleep(frames*FRAME_DURATION);
-        } catch (InterruptedException e) {}
+            Thread.sleep(FRAME_DURATION);
+
+            final int frames = (int) (degrees / ROTATION_DEGREE);
+
+            timeline = new Timeline(
+                    new KeyFrame(
+                            Duration.millis(FRAME_DURATION),
+                            event -> setRotate(getRotate() - ROTATION_DEGREE)
+                    ));
+            timeline.setCycleCount(frames);
+            timeline.play();
+
+            Thread.sleep(frames * FRAME_DURATION);
+        } catch (InterruptedException e) {
+        }
     }
 
     public void rotateRight(double degrees) {
@@ -78,21 +81,24 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setRotate(getRotate()+((int)degrees)%ROTATION_DEGREE);
-
-        final int frames = (int) (degrees/ROTATION_DEGREE);
-
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.millis(FRAME_DURATION),
-                        event -> setRotate(getRotate()+ROTATION_DEGREE)
-                ));
-        timeline.setCycleCount(frames);
-        timeline.play();
+        setRotate(getRotate() + ((int) degrees) % ROTATION_DEGREE);
 
         try {
-            Thread.sleep(frames*FRAME_DURATION);
-        } catch (InterruptedException e) {}
+            Thread.sleep(FRAME_DURATION);
+
+            final int frames = (int) (degrees / ROTATION_DEGREE);
+
+            timeline = new Timeline(
+                    new KeyFrame(
+                            Duration.millis(FRAME_DURATION),
+                            event -> setRotate(getRotate() + ROTATION_DEGREE)
+                    ));
+            timeline.setCycleCount(frames);
+            timeline.play();
+
+            Thread.sleep(frames * FRAME_DURATION);
+        } catch (InterruptedException e) {
+        }
     }
 
     public void moveLeft(double pixels) {
@@ -101,22 +107,27 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setX(getX()-((int)pixels)%MOVE_STEP);
-
-        final int frames = (int) (pixels/MOVE_STEP);
-
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.millis(FRAME_DURATION),
-                        event ->
-                            setX(getX()-MOVE_STEP))
-        );
-        timeline.setCycleCount(frames);
-        timeline.play();
-
         try {
-            Thread.sleep(frames*FRAME_DURATION);
-        } catch (InterruptedException e) {}
+            setX(getX() - ((int) pixels) % MOVE_STEP);
+
+            Thread.sleep(FRAME_DURATION);
+
+            if (pixels >= MOVE_STEP) {
+                final int frames = (int) (pixels / MOVE_STEP);
+
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.millis(FRAME_DURATION),
+                                event ->
+                                        setX(getX() - MOVE_STEP))
+                );
+                timeline.setCycleCount(frames);
+                timeline.play();
+
+                Thread.sleep(frames * FRAME_DURATION);
+            }
+        } catch (InterruptedException e) {
+        }
     }
 
     public void moveRight(double pixels) {
@@ -125,21 +136,30 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setX(getX()+((int)pixels)%MOVE_STEP);
-
-        final int frames = (int) (pixels/MOVE_STEP);
-
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.millis(FRAME_DURATION),
-                        event -> setX(getX()+MOVE_STEP))
-        );
-        timeline.setCycleCount(frames);
-        timeline.play();
-
         try {
-            Thread.sleep(frames*FRAME_DURATION);
-        } catch (InterruptedException e) {}
+            setX(getX() + ((int) pixels) % MOVE_STEP);
+
+            Thread.sleep(FRAME_DURATION);
+
+            if (pixels >= MOVE_STEP) {
+                final int frames = (int) (pixels / MOVE_STEP);
+
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.millis(FRAME_DURATION),
+                                event -> {
+                                    setX(getX() + MOVE_STEP);
+                                    System.out.println(timeline.getCurrentTime());
+                                }
+                        ));
+                timeline.setCycleCount(frames);
+                timeline.play();
+
+
+                Thread.sleep(frames * FRAME_DURATION);
+            }
+        } catch (InterruptedException e) {
+        }
     }
 
     public void moveDown(double pixels) {
@@ -148,21 +168,28 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setY(getY()+((int)pixels)%MOVE_STEP);
-
-        final int frames = (int) (pixels/MOVE_STEP);
-
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.millis(FRAME_DURATION),
-                        event -> setY(getY()+MOVE_STEP))
-        );
-        timeline.setCycleCount(frames);
-        timeline.play();
-
         try {
-            Thread.sleep(frames*FRAME_DURATION);
-        } catch (InterruptedException e) {}
+            setY(getY() + ((int) pixels) % MOVE_STEP);
+
+            Thread.sleep(FRAME_DURATION);
+
+            if (pixels >= MOVE_STEP) {
+                Thread.sleep(FRAME_DURATION);
+
+                final int frames = (int) (pixels / MOVE_STEP);
+
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.millis(FRAME_DURATION),
+                                event -> setY(getY() + MOVE_STEP))
+                );
+                timeline.setCycleCount(frames);
+                timeline.play();
+
+                Thread.sleep(frames * FRAME_DURATION);
+            }
+        } catch (InterruptedException e) {
+        }
     }
 
     public void moveUp(double pixels) {
@@ -171,21 +198,27 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setY(getY()-((int)pixels)%MOVE_STEP);
-
-        final int frames = (int) (pixels/MOVE_STEP);
-
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.millis(FRAME_DURATION),
-                        event -> setY(getY()-MOVE_STEP))
-        );
-        timeline.setCycleCount(frames);
-        timeline.play();
-
         try {
-            Thread.sleep(frames*FRAME_DURATION);
-        } catch (InterruptedException e) {}
+            setY(getY() - ((int) pixels) % MOVE_STEP);
+
+            Thread.sleep(FRAME_DURATION);
+
+            if (pixels >= MOVE_STEP) {
+                Thread.sleep(FRAME_DURATION);
+
+                final int frames = (int) (pixels / MOVE_STEP);
+
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.millis(FRAME_DURATION),
+                                event -> setY(getY() - MOVE_STEP))
+                );
+                timeline.setCycleCount(frames);
+                timeline.play();
+
+                Thread.sleep(frames * FRAME_DURATION);
+            }
+        } catch (InterruptedException e) { }
     }
 
     public void changeSize(int a) {
@@ -222,7 +255,7 @@ public class Sprite extends ImageView {
         label.setStyle(css);
 
         Pane pane = (Pane) getParent().getParent();
-        Platform.runLater(()-> pane.getChildren().add(label));
+        Platform.runLater(() -> pane.getChildren().add(label));
 
         PauseTransition pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(e -> pane.getChildren().remove(label));
@@ -232,8 +265,9 @@ public class Sprite extends ImageView {
 
     public void sleep(int seconds) {
         try {
-            Thread.sleep(seconds*1000);
-        } catch (InterruptedException e) {}
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+        }
     }
 
     public Program getProgram() {

@@ -9,6 +9,7 @@ public class Expression extends Operand {
     private LinkedList<TokenType> operators;
     private LinkedList<Operand> operands;
     private int value;
+    private boolean isNegated = false;
 
     public Expression(LinkedList<TokenType> operators, LinkedList<Operand> operands) {
         this.operators = operators;
@@ -30,5 +31,13 @@ public class Expression extends Operand {
 
     public void setValue(int value) {
         this.value = value;
+    }
+
+    public boolean isNegated() {
+        return isNegated;
+    }
+
+    public void setNegated(boolean negated) {
+        isNegated = negated;
     }
 }
