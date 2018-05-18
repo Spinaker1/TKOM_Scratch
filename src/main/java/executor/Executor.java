@@ -60,7 +60,6 @@ public class Executor {
     }
 
     private void executeFunction(Function function, Scope scope)  {
-        System.out.println("function");
         LinkedList<Assignable> arguments = function.getArguments();
 
         for(Assignable argument: arguments) {
@@ -121,25 +120,13 @@ public class Executor {
                     StringLiteral stringLiteral = (StringLiteral) arguments.get(0);
                     value = stringLiteral.getValue();
                 }
-                /*
-                if (arguments.get(0).getNodeType() == NodeType.EXPRESSION) {
-                    Assignable assignable = arguments.get(0);
-                    while (assignable.getNodeType() == NodeType.EXPRESSION) {
-                        LinkedList<Operand> operands = ((Expression) assignable).getOperands();
-                        assignable = operands.get(0);
-                    }
-                    Variable variable = (Variable) assignable;
-                    variable = scope.getVariable(variable.getName());
-                    value = variable.getStringValue();
-                }
-                */
+
                 sprite.talk(value);
                 break;
         }
     }
 
     private void executeAssignment(Assignment assignment, Scope scope)  {
-        System.out.println("assigment");
         Assignable assignable = assignment.getValue();
         Variable variable = scope.getVariable(assignment.getVariable().getName());
 
@@ -152,12 +139,12 @@ public class Executor {
             Expression expression = (Expression) assignable;
             variable.setIntValue(executeAssignable(expression,scope));
             variable.setVariableType(VariableType.INT);
-            System.out.println(variable.getIntValue());
         }
     }
 
     private void executeIfStatement(IfStatement ifStatement, Scope scope)  {
         boolean result = executeCondition(ifStatement.getCondition(), scope);
+        System.out.println(result);
         if (result) {
             executeBlock(ifStatement.getCodeBlock());
         }
@@ -178,7 +165,6 @@ public class Executor {
     }
 
     private int executeAssignable(Assignable assignable, Scope scope)  {
-        System.out.println("assignable");
         if (assignable.getNodeType() == NodeType.INT_LITERAL) {
             return ((IntLiteral)assignable).getValue();
         }
@@ -242,8 +228,6 @@ public class Executor {
     }
 
     private boolean executeCondition(Condition condition, Scope scope) {
-        System.out.println("condition");
-
         if (condition.getOperators().size() == 0) {
             return executeCondition((Condition) condition.getOperands().get(0), scope);
         }
@@ -274,6 +258,23 @@ public class Executor {
                 return x1 > x2;
             case GREATER_EQUAL:
                 return x1 >= x2;
+            case OR:
+                for (Node node: condition.getOperands()) {
+                    Condition condition1 = (Condition) node;
+                    if (executeCondition(condition1,scope)) {
+                        return true;
+                    }
+                }
+                return false;
+
+            case AND:
+                for (Node node: condition.getOperands()) {
+                    Condition condition1 = (Condition) node;
+                    if (!executeCondition(condition1,scope)) {
+                        return false;
+                    }
+                }
+                return true;
         }
 
         return true;

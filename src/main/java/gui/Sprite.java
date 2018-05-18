@@ -50,6 +50,11 @@ public class Sprite extends ImageView {
     }
 
     public void rotateLeft(double degrees) {
+        if (degrees < 0) {
+            rotateRight(-degrees);
+            return;
+        }
+
         setRotate(getRotate()-((int)degrees)%ROTATION_DEGREE);
 
         final int frames = (int) (degrees/ROTATION_DEGREE);
@@ -68,6 +73,11 @@ public class Sprite extends ImageView {
     }
 
     public void rotateRight(double degrees) {
+        if (degrees < 0) {
+            rotateLeft(-degrees);
+            return;
+        }
+
         setRotate(getRotate()+((int)degrees)%ROTATION_DEGREE);
 
         final int frames = (int) (degrees/ROTATION_DEGREE);
@@ -86,6 +96,11 @@ public class Sprite extends ImageView {
     }
 
     public void moveLeft(double pixels) {
+        if (pixels < 0) {
+            moveRight(-pixels);
+            return;
+        }
+
         setX(getX()-((int)pixels)%MOVE_STEP);
 
         final int frames = (int) (pixels/MOVE_STEP);
@@ -105,6 +120,11 @@ public class Sprite extends ImageView {
     }
 
     public void moveRight(double pixels) {
+        if (pixels < 0) {
+            moveLeft(-pixels);
+            return;
+        }
+
         setX(getX()+((int)pixels)%MOVE_STEP);
 
         final int frames = (int) (pixels/MOVE_STEP);
@@ -123,6 +143,11 @@ public class Sprite extends ImageView {
     }
 
     public void moveDown(double pixels) {
+        if (pixels < 0) {
+            moveUp(-pixels);
+            return;
+        }
+
         setY(getY()+((int)pixels)%MOVE_STEP);
 
         final int frames = (int) (pixels/MOVE_STEP);
@@ -141,6 +166,11 @@ public class Sprite extends ImageView {
     }
 
     public void moveUp(double pixels) {
+        if (pixels < 0) {
+            moveDown(-pixels);
+            return;
+        }
+
         setY(getY()-((int)pixels)%MOVE_STEP);
 
         final int frames = (int) (pixels/MOVE_STEP);
@@ -188,7 +218,7 @@ public class Sprite extends ImageView {
 
         Label label = new Label(text);
         label.setLayoutX(this.getX() + getWidth());
-        label.setLayoutY(this.getY() - getHeight() * 0.3);
+        label.setLayoutY(this.getY() - getHeight() * 0.);
         label.setStyle(css);
 
         Pane pane = (Pane) getParent().getParent();
@@ -225,6 +255,6 @@ public class Sprite extends ImageView {
     }
 
     public double getHeight() {
-        return  getImage().getHeight();
+        return getImage().getHeight();
     }
 }
