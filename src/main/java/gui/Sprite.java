@@ -55,22 +55,25 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setRotate(getRotate() - ((int) degrees) % ROTATION_DEGREE);
-
         try {
+            setRotate(getRotate() - ((int) degrees) % ROTATION_DEGREE);
+
             Thread.sleep(FRAME_DURATION);
 
-            final int frames = (int) (degrees / ROTATION_DEGREE);
+            if (degrees >= ROTATION_DEGREE) {
 
-            timeline = new Timeline(
-                    new KeyFrame(
-                            Duration.millis(FRAME_DURATION),
-                            event -> setRotate(getRotate() - ROTATION_DEGREE)
-                    ));
-            timeline.setCycleCount(frames);
-            timeline.play();
+                final int frames = (int) (degrees / ROTATION_DEGREE);
 
-            Thread.sleep(frames * FRAME_DURATION);
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.millis(FRAME_DURATION),
+                                event -> setRotate(getRotate() - ROTATION_DEGREE)
+                        ));
+                timeline.setCycleCount(frames);
+                timeline.play();
+
+                Thread.sleep(frames * FRAME_DURATION);
+            }
         } catch (InterruptedException e) {
         }
     }
@@ -81,22 +84,25 @@ public class Sprite extends ImageView {
             return;
         }
 
-        setRotate(getRotate() + ((int) degrees) % ROTATION_DEGREE);
-
         try {
+            setRotate(getRotate() + ((int) degrees) % ROTATION_DEGREE);
+
             Thread.sleep(FRAME_DURATION);
 
-            final int frames = (int) (degrees / ROTATION_DEGREE);
+            if (degrees >= ROTATION_DEGREE) {
 
-            timeline = new Timeline(
-                    new KeyFrame(
-                            Duration.millis(FRAME_DURATION),
-                            event -> setRotate(getRotate() + ROTATION_DEGREE)
-                    ));
-            timeline.setCycleCount(frames);
-            timeline.play();
+                final int frames = (int) (degrees / ROTATION_DEGREE);
 
-            Thread.sleep(frames * FRAME_DURATION);
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.millis(FRAME_DURATION),
+                                event -> setRotate(getRotate() + ROTATION_DEGREE)
+                        ));
+                timeline.setCycleCount(frames);
+                timeline.play();
+
+                Thread.sleep(frames * FRAME_DURATION);
+            }
         } catch (InterruptedException e) {
         }
     }
@@ -218,7 +224,8 @@ public class Sprite extends ImageView {
 
                 Thread.sleep(frames * FRAME_DURATION);
             }
-        } catch (InterruptedException e) { }
+        } catch (InterruptedException e) {
+        }
     }
 
     public void changeSize(int a) {
