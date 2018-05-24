@@ -143,6 +143,9 @@ public class Main extends Application {
             }
             catch (Exception e) {
                 String errorText = "Błąd! Zatrzymano wykonanie programu.\n" + e.getMessage();
+
+                e.printStackTrace();
+
                 errorTextArea.setText(errorText);
                 stopSpriteThread();
             }

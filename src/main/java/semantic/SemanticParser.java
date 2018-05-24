@@ -79,7 +79,11 @@ public class SemanticParser {
         }
     }
 
-    private void checkArgumentsType(Function function, Scope scope) throws Exception {
+    private void checkArguments(Function function, Scope scope) throws Exception {
+        for (Assignable argument : function.getArguments()) {
+            checkAssignable(argument, scope);
+        }
+        /*
         int i = 0;
         VariableType[] expectedVariableTypes = FunctionArgumentsHashMap.FUNCTION_ARGUMENTS.get(function.getFunctionType());
 
@@ -106,11 +110,12 @@ public class SemanticParser {
                 }
             }
         }
+        */
     }
 
     private void checkFunction(Function function, Scope scope) throws Exception {
         checkArgumentsCount(function);
-        checkArgumentsType(function, scope);
+        checkArguments(function,scope);
     }
 
     private void checkAssignment(Assignment assignment, Scope scope) throws Exception {
@@ -120,24 +125,10 @@ public class SemanticParser {
         if (!scope.containsVariable(variable.getName())) {
             scope.putVariable(variable);
         }
-        else {
-            variable = scope.getVariable(variable.getName());
-        }
 
-        if (assignable.getNodeType() == NodeType.STRING_LITERAL) {
-            variable.setVariableType(VariableType.STRING);
-            variable.setStringValue(((StringLiteral)assignable).getValue());
-        } else {
+        if (assignable.getNodeType() == NodeType.EXPRESSION) {
             Expression expression = (Expression) assignable;
-            String value;
-            if ((value = checkStringVariable(expression, scope)) != null) {
-                assignment.setValue(new StringLiteral(value));
-                variable.setVariableType(VariableType.STRING);
-                variable.setStringValue(value);
-            } else {
-                checkAssignable(expression, scope);
-                variable.setVariableType(VariableType.INT);
-            }
+            checkAssignable(expression, scope);
         }
     }
 
@@ -189,11 +180,6 @@ public class SemanticParser {
     private void checkVariable(Variable variable, Scope scope) throws Exception {
         if (!scope.containsVariable(variable.getName())) {
             throw new Exception("Użyto niezainicjalizowanej zmiennej.");
-        }
-
-        variable = scope.getVariable(variable.getName());
-        if (variable.getVariableType() != VariableType.INT) {
-            throw new Exception("Zmienna musi zawierać liczbę całkowitą.");
         }
     }
 
