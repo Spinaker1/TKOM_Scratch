@@ -83,34 +83,6 @@ public class SemanticParser {
         for (Assignable argument : function.getArguments()) {
             checkAssignable(argument, scope);
         }
-        /*
-        int i = 0;
-        VariableType[] expectedVariableTypes = FunctionArgumentsHashMap.FUNCTION_ARGUMENTS.get(function.getFunctionType());
-
-        for (Assignable argument : function.getArguments()) {
-            if (expectedVariableTypes[i] == VariableType.STRING) {
-                if (argument.getNodeType() == NodeType.STRING_LITERAL) {
-                    return;
-                } else {
-                    String value;
-                    if ((value = checkStringVariable(argument, scope)) != null) {
-                        function.getArguments().set(i,new StringLiteral(value));
-                        return;
-                    } else {
-                        throw new Exception("Argument powinien zawierać napis.");
-                    }
-                }
-            }
-
-            if (expectedVariableTypes[i] == VariableType.INT) {
-                if (argument.getNodeType() == NodeType.STRING_LITERAL) {
-                    throw new Exception("Argument powinien zawierać liczbę całkowitą.");
-                } else {
-                    checkAssignable(argument, scope);
-                }
-            }
-        }
-        */
     }
 
     private void checkFunction(Function function, Scope scope) throws Exception {
@@ -175,7 +147,6 @@ public class SemanticParser {
             }
         }
     }
-
 
     private void checkVariable(Variable variable, Scope scope) throws Exception {
         if (!scope.containsVariable(variable.getName())) {

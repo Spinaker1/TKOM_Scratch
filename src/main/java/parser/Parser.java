@@ -254,7 +254,6 @@ public class Parser {
             return condition;
         }
 
-
         if (checkTokenType(currentToken,TokenType.NEGATION)) {
             accept(getToken(), TokenType.SQUARE_BRACKET_OPEN,"");
             getToken();
@@ -311,12 +310,23 @@ public class Parser {
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
-        operands.add(parsePrimaryExpression());
+        Operand operand;
+        if ((operand = parsePrimaryExpression()) == null) {
+            throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
+        } else {
+            operands.add(operand);
+        }
+
         while (checkTokenType(getToken(), TokenType.MULTIPLY) ||
                 checkTokenType(currentToken, TokenType.DIVIDE) ) {
             operators.add(currentToken.getTokenType());
             getToken();
-            operands.add(parsePrimaryExpression());
+
+            if ((operand = parsePrimaryExpression()) == null) {
+                throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
+            } else {
+                operands.add(operand);
+            }
         }
 
         return new Expression(operators, operands);

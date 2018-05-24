@@ -1,6 +1,5 @@
 package semantic;
 
-import node.Function;
 import node.VariableType;
 import token.FunctionType;
 
@@ -8,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FunctionArgumentsHashMap {
-        static final Map<FunctionType, VariableType[]> FUNCTION_ARGUMENTS = new HashMap<FunctionType, VariableType[]>() {{
+        public static final Map<FunctionType, VariableType[]> FUNCTION_ARGUMENTS = new HashMap<FunctionType, VariableType[]>() {{
             put(FunctionType.CHANGE_COLOR, new VariableType[]{VariableType.INT,VariableType.INT,VariableType.INT});
             put(FunctionType.GO, new VariableType[]{VariableType.INT,VariableType.INT});
             put(FunctionType.GO_LEFT, new VariableType[]{VariableType.INT});
