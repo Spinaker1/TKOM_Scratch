@@ -23,7 +23,7 @@ public class Main extends Application {
     private final int WIDTH = 1000;
     private final int HEIGHT = 550;
 
-    private Map<Sprite, SpriteThread> spriteThreadsHashMap = new HashMap<>();
+    private SpriteThread spriteThread;
 
     private CollisionThread collisionThread = new CollisionThread();
 
@@ -55,8 +55,7 @@ public class Main extends Application {
         root.getChildren().add(consoleTextArea);
         root.getChildren().add(errorTextArea);
         root.getChildren().add(spritesBoard);
-
-
+        
         HBox hBox = new HBox();
         hBox.setLayoutX(600);
 
@@ -115,16 +114,13 @@ public class Main extends Application {
 
         stopSpriteThread();
 
-        SpriteThread newSpriteThread = new SpriteThread(sprite, eventType);
-        spriteThreadsHashMap.put(sprite, newSpriteThread);
-        newSpriteThread.start();
+        spriteThread = new SpriteThread(sprite, eventType);
+        spriteThread.start();
     }
 
     private void stopSpriteThread() {
-        if (spriteThreadsHashMap.containsKey(sprite)) {
-            SpriteThread spriteThreadToDelete = spriteThreadsHashMap.get(sprite);
-            spriteThreadsHashMap.remove(sprite);
-            spriteThreadToDelete.stop();
+        if (spriteThread != null ) {
+            spriteThread.stop();
         }
     }
 
