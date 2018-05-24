@@ -15,10 +15,6 @@ public class Block extends Node {
         return instructions;
     }
 
-    public void setInstructions(LinkedList<Node> instructions) {
-        this.instructions = instructions;
-    }
-
     public Scope getScope() {
         return scope;
     }

@@ -153,31 +153,5 @@ public class SemanticParser {
             throw new Exception("Użyto niezainicjalizowanej zmiennej.");
         }
     }
-
-    private String checkStringVariable(Assignable assignable, Scope scope) {
-        while (assignable.getNodeType() == NodeType.EXPRESSION) {
-            LinkedList<Operand> operands = ((Expression) assignable).getOperands();
-            if (operands.size() != 1) {
-                return null;
-            }
-            assignable = operands.get(0);
-        }
-
-        if (assignable.getNodeType() != NodeType.VARIABLE) {
-            return null;
-        }
-
-        Variable variable = (Variable) assignable;
-        if (!scope.containsVariable(variable.getName())) {
-            return null;
-        }
-
-        variable = scope.getVariable(variable.getName());
-        if (variable.getVariableType() != VariableType.STRING) {
-            return null;
-        }
-
-        return variable.getStringValue();
-    }
 }
 

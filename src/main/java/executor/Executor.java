@@ -251,7 +251,6 @@ public class Executor {
             if (operand.getNodeType() == NodeType.VARIABLE) {
                 Variable variable = (Variable) operand;
                 variable = scope.getVariable(variable.getName());
-                System.out.println(variable.getVariableType());
                 if (variable.getVariableType() == VariableType.STRING) {
                     throw new Exception("Zmienna powinna zawierać liczbę.");
                 }
