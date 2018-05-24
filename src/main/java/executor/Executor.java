@@ -12,7 +12,7 @@ import java.util.concurrent.locks.Condition;
 public class Executor {
     private Sprite sprite;
 
-    public void execute(Sprite sprite, EventType eventType)  {
+    public void execute(Sprite sprite, EventType eventType) throws Exception  {
         this.sprite = sprite;
 
         Program program;
@@ -28,11 +28,11 @@ public class Executor {
         }
     }
 
-    private void executeEvent(Event event)  {
+    private void executeEvent(Event event) throws Exception {
         executeBlock(event.getCodeBlock());
     }
 
-    private void executeBlock(Block block) {
+    private void executeBlock (Block block) throws Exception {
         Scope scope = block.getScope();
 
         for (Node instruction : block.getInstructions()) {
@@ -60,7 +60,7 @@ public class Executor {
         }
     }
 
-    private void executeFunction(Function function, Scope scope)  {
+    private void executeFunction(Function function, Scope scope) throws Exception  {
         LinkedList<Assignable> arguments = function.getArguments();
 
         for(Assignable argument: arguments) {
@@ -97,17 +97,35 @@ public class Executor {
                 break;
 
             case CHANGE_SIZE:
-                sprite.changeSize((((Expression)arguments.get(0)).getValue()));
+                int size = (((Expression)arguments.get(0)).getValue());
+
+                if (size < 0) {
+                    throw new Exception("Funkcja zmienKolor() nie przyjmuje ujemnych argumentów.");
+                }
+
+                sprite.changeSize(size);
                 break;
 
             case CHANGE_COLOR:
-                sprite.changeColor(((Expression)arguments.get(0)).getValue(),
-                        ((Expression)arguments.get(1)).getValue(),
-                        ((Expression)arguments.get(2)).getValue());
+                int r = ((Expression)arguments.get(0)).getValue();
+                int g = ((Expression)arguments.get(1)).getValue();
+                int b = ((Expression)arguments.get(2)).getValue();
+
+                if (r < 0 || g < 0 || b < 0 || r > 255 || g > 255 || b > 255) {
+                    throw new Exception("Podany argument jest poza zakresem RGB 0-255");
+                }
+
+                sprite.changeColor(r,g,b);
                 break;
 
             case WAIT:
-                sprite.sleep(((Expression)arguments.get(0)).getValue());
+                int seconds = (((Expression)arguments.get(0)).getValue());
+
+                if (seconds < 0) {
+                    throw new Exception("Funkcja czekaj() nie przyjmuje ujemnych argumentów.");
+                }
+
+                sprite.sleep(seconds);
                 break;
 
             case GO:
@@ -127,7 +145,7 @@ public class Executor {
         }
     }
 
-    private void executeAssignment(Assignment assignment, Scope scope)  {
+    private void executeAssignment(Assignment assignment, Scope scope) throws Exception  {
         Assignable assignable = assignment.getValue();
         Variable variable = scope.getVariable(assignment.getVariable().getName());
 
@@ -143,7 +161,7 @@ public class Executor {
         }
     }
 
-    private void executeIfStatement(IfStatement ifStatement, Scope scope)  {
+    private void executeIfStatement(IfStatement ifStatement, Scope scope) throws Exception  {
         boolean result = executeCondition(ifStatement.getCondition(), scope);
         System.out.println(result);
         if (result) {
@@ -151,7 +169,7 @@ public class Executor {
         }
     }
 
-    private void executeRepeatStatement(RepeatStatement repeatStatement)  {
+    private void executeRepeatStatement(RepeatStatement repeatStatement) throws Exception  {
         Block block = repeatStatement.getCodeBlock();
 
         for (int i = 1; i <= repeatStatement.getRepeatingCount(); i++) {
@@ -159,13 +177,13 @@ public class Executor {
         }
     }
 
-    private void executeRepeatIfStatement(RepeatIfStatement repeatIfStatement, Scope scope)  {
+    private void executeRepeatIfStatement(RepeatIfStatement repeatIfStatement, Scope scope) throws Exception  {
         while (executeCondition(repeatIfStatement.getCondition(),scope)) {
             executeBlock(repeatIfStatement.getCodeBlock());
         }
     }
 
-    private int executeAssignable(Assignable assignable, Scope scope)  {
+    private int executeAssignable(Assignable assignable, Scope scope) throws Exception  {
         if (assignable.getNodeType() == NodeType.INT_LITERAL) {
             return ((IntLiteral)assignable).getValue();
         }
@@ -196,7 +214,7 @@ public class Executor {
         return 0;
     }
 
-    private int executeExpression(Expression expression, Scope scope) {
+    private int executeExpression (Expression expression, Scope scope) throws Exception  {
         int i = -1;
         int value = 0;
 
@@ -228,7 +246,7 @@ public class Executor {
         return value;
     }
 
-    private boolean executeCondition(Expression condition, Scope scope) {
+    private boolean executeCondition (Expression condition, Scope scope) throws Exception  {
         if (condition.getOperators().size() == 0) {
             return executeCondition((Expression) condition.getOperands().get(0), scope) ^ condition.isNegated();
         }

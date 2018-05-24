@@ -70,7 +70,6 @@ public class ParserTest {
         }
     }
 
-
     @Test
     public void shouldParseIfStatementAndFunction() {
         try {

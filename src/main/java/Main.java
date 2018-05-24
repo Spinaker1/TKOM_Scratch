@@ -138,7 +138,14 @@ public class Main extends Application {
 
         @Override
         public void run() {
-            executor.execute(sprite, eventType);
+            try {
+                executor.execute(sprite, eventType);
+            }
+            catch (Exception e) {
+                String errorText = "Błąd! Zatrzymano wykonanie programu.\n" + e.getMessage();
+                errorTextArea.setText(errorText);
+                stopSpriteThread();
+            }
         }
     }
 
