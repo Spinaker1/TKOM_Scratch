@@ -29,6 +29,8 @@ public class Sprite extends ImageView {
     private final int ROTATION_DEGREE = 5; //degrees
 
     private Timeline timeline;
+    private PauseTransition pause;
+    private Label label;
 
     public Sprite(Stage stage) {
         this.stage = stage;
@@ -153,9 +155,7 @@ public class Sprite extends ImageView {
                 timeline = new Timeline(
                         new KeyFrame(
                                 Duration.millis(FRAME_DURATION),
-                                event -> {
-                                    setX(getX() + MOVE_STEP);
-                                }
+                                event -> setX(getX() + MOVE_STEP)
                         ));
                 timeline.setCycleCount(frames);
                 timeline.play();
@@ -255,7 +255,7 @@ public class Sprite extends ImageView {
                 "    -fx-background-insets: 0,1;\n" +
                 "    -fx-padding: 50;";
 
-        Label label = new Label(text);
+        label = new Label(text);
         label.setLayoutX(this.getX() + getWidth());
         label.setLayoutY(this.getY() - getHeight() * 0.);
         label.setStyle(css);
@@ -263,7 +263,7 @@ public class Sprite extends ImageView {
         Pane pane = (Pane) getParent().getParent();
         Platform.runLater(() -> pane.getChildren().add(label));
 
-        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(e -> pane.getChildren().remove(label));
         pause.play();
         sleep(3);
@@ -288,6 +288,11 @@ public class Sprite extends ImageView {
         if (timeline != null) {
             timeline.stop();
         }
+        if (pause != null) {
+            pause.stop();
+        }
+        Pane pane = (Pane) getParent().getParent();
+        pane.getChildren().remove(label);
     }
 
     public double getWidth() {

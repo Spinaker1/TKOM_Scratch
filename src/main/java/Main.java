@@ -110,8 +110,6 @@ public class Main extends Application {
     }
 
     private void startNewSpriteThread(EventType eventType) {
-        sprite.stopTimeLine();
-
         stopSpriteThread();
 
         spriteThread = new SpriteThread(sprite, eventType);
@@ -120,6 +118,7 @@ public class Main extends Application {
 
     private void stopSpriteThread() {
         if (spriteThread != null ) {
+            sprite.stopTimeLine();
             spriteThread.stop();
         }
     }
