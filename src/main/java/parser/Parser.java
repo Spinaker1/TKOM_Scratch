@@ -56,21 +56,13 @@ public class Parser {
         EventType eventType = currentToken.getEventType();
 
         accept(getToken(), TokenType.PARENTHESIS_OPEN, "Oczekiwane wyrażenie: (");
-
-        String argument = null;
-        if (checkTokenType(getToken(), TokenType.VARIABLE)) {
-            argument = currentToken.getStringValue();
-            accept(getToken(), TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
-        }
-        else  {
-            accept(currentToken, TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
-        }
+        accept(getToken(), TokenType.PARENTHESIS_CLOSE, "Oczekiwane wyrażenie: )");
 
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
             throw new Exception();
 
-        return new Event(eventType, argument, codeBlock);
+        return new Event(eventType, codeBlock);
     }
 
     private Block parseBlock() throws Exception {

@@ -55,7 +55,7 @@ public class Main extends Application {
         root.getChildren().add(consoleTextArea);
         root.getChildren().add(errorTextArea);
         root.getChildren().add(spritesBoard);
-        
+
         HBox hBox = new HBox();
         hBox.setLayoutX(600);
 

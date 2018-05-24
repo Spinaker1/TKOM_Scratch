@@ -27,10 +27,6 @@ public class SemanticParser {
     }
 
     private void checkEvent(Event event) throws Exception {
-        if (event.getEventType() != EventType.COLLISION && event.getArgument() != null) {
-            throw new Exception("Zdarzenie tego typu nie powinno mieć argumentu.");
-        }
-
         Block block = event.getCodeBlock();
         block.setScope(new Scope(null));
         checkBlock(block);

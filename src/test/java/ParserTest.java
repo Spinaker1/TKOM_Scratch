@@ -29,7 +29,6 @@ public class ParserTest {
             assertEquals(EventType.START, events.get(1).getEventType());
             assertEquals(EventType.WALL, events.get(2).getEventType());
             assertEquals(EventType.COLLISION, events.get(3).getEventType());
-            assertEquals("kangurek", events.get(3).getArgument());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
