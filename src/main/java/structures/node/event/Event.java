@@ -1,6 +1,8 @@
-package node;
+package structures.node.event;
 
-import token.EventType;
+import structures.node.Node;
+import structures.node.NodeType;
+import structures.node.block.Block;
 
 public class Event extends Node {
     private EventType eventType;

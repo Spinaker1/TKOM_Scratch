@@ -1,4 +1,9 @@
-package node;
+package structures.node.loop;
+
+import structures.node.assignable.expression.Expression;
+import structures.node.block.Block;
+import structures.node.Node;
+import structures.node.NodeType;
 
 public class RepeatIfStatement extends Node {
     private Block codeBlock;

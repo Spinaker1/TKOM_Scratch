@@ -1,17 +1,15 @@
-package lexer;
+package structures;
 
-import com.sun.org.apache.xpath.internal.axes.WalkingIterator;
-import node.Function;
-import token.EventType;
-import token.FunctionType;
-import token.Token;
-import token.TokenType;
+import structures.node.assignable.function.FunctionType;
+import structures.node.event.EventType;
+import structures.token.Token;
+import structures.token.TokenType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class KeywordsHashmap {
-    static final Map<String, Token> KEYWORDS = new HashMap<String, Token>() {{
+public class KeywordsHashmap {
+    public static final Map<String, Token> KEYWORDS = new HashMap<String, Token>() {{
         put("jezeli", new Token(TokenType.IF));
         put("powtorz", new Token(TokenType.REPEAT));
         put("powtorzJezeli", new Token(TokenType.REPEAT_IF));

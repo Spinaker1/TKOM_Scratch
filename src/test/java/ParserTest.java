@@ -1,5 +1,4 @@
 import input.InputManager;
-import node.*;
 import lexer.Lexer;
 import parser.Parser;
 
@@ -8,9 +7,20 @@ import java.util.LinkedList;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import token.EventType;
-import token.FunctionType;
-import token.TokenType;
+import structures.node.assignable.expression.Expression;
+import structures.node.assignable.literal.IntLiteral;
+import structures.node.assignable.literal.StringLiteral;
+import structures.node.assignment.Assignment;
+import structures.node.event.EventType;
+import structures.node.assignable.function.FunctionType;
+import structures.node.assignable.function.Function;
+import structures.node.assignable.variable.Variable;
+import structures.node.block.Block;
+import structures.node.event.Event;
+import structures.node.ifstatement.IfStatement;
+import structures.node.loop.RepeatStatement;
+import structures.node.program.Program;
+import structures.token.TokenType;
 
 public class ParserTest {
 

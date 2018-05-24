@@ -1,7 +1,9 @@
 package lexer;
 
-import token.Token;
-import token.TokenType;
+import structures.FunctionArgumentsHashMap;
+import structures.KeywordsHashmap;
+import structures.token.Token;
+import structures.token.TokenType;
 
 import input.InputManager;
 

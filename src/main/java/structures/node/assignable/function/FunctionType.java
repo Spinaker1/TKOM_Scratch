@@ -1,4 +1,4 @@
-package token;
+package structures.node.assignable.function;
 
 public enum FunctionType {
     GO,

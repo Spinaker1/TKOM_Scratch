@@ -1,7 +1,10 @@
-package semantic;
+package structures;
 
-import node.VariableType;
-import token.FunctionType;
+import structures.node.assignable.variable.VariableType;
+import structures.node.assignable.function.FunctionType;
+import structures.node.event.EventType;
+import structures.token.Token;
+import structures.token.TokenType;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,7 @@
-package node;
+package structures.node.block;
+
+import structures.node.Node;
+import structures.node.NodeType;
 
 import java.util.LinkedList;
 

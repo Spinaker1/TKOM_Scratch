@@ -1,4 +1,8 @@
-package node;
+package structures.node.loop;
+
+import structures.node.Node;
+import structures.node.NodeType;
+import structures.node.block.Block;
 
 public class RepeatStatement extends Node {
     private Block codeBlock;

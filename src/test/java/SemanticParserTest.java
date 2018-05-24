@@ -1,6 +1,6 @@
 import input.InputManager;
 import lexer.Lexer;
-import node.Program;
+import structures.node.program.Program;
 import org.junit.Test;
 import parser.Parser;
 import semantic.SemanticParser;

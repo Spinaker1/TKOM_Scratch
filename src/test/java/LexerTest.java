@@ -1,10 +1,9 @@
 import input.InputManager;
-import node.Function;
 import org.junit.Test;
-import token.EventType;
-import token.FunctionType;
-import token.Token;
-import token.TokenType;
+import structures.node.event.EventType;
+import structures.node.assignable.function.FunctionType;
+import structures.token.Token;
+import structures.token.TokenType;
 import lexer.Lexer;
 
 import static org.junit.Assert.*;

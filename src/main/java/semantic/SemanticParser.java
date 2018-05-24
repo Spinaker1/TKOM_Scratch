@@ -1,8 +1,21 @@
 package semantic;
 
-import node.*;
-import token.EventType;
-import token.FunctionType;
+import structures.node.*;
+import structures.FunctionArgumentsHashMap;
+import structures.node.assignment.Assignment;
+import structures.node.event.EventType;
+import structures.node.assignable.function.FunctionType;
+import structures.node.assignable.Assignable;
+import structures.node.assignable.expression.Expression;
+import structures.node.assignable.function.Function;
+import structures.node.assignable.variable.Variable;
+import structures.node.block.Block;
+import structures.node.block.Scope;
+import structures.node.event.Event;
+import structures.node.ifstatement.IfStatement;
+import structures.node.loop.RepeatIfStatement;
+import structures.node.loop.RepeatStatement;
+import structures.node.program.Program;
 
 import java.util.LinkedList;
 

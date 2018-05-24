@@ -1,4 +1,9 @@
-package node;
+package structures.node.ifstatement;
+
+import structures.node.Node;
+import structures.node.NodeType;
+import structures.node.assignable.expression.Expression;
+import structures.node.block.Block;
 
 public class IfStatement extends Node {
     private Block codeBlock;

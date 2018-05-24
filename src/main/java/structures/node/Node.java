@@ -1,7 +1,7 @@
-package node;
+package structures.node;
 
 public class Node {
-    NodeType nodeType;
+    protected NodeType nodeType;
 
     public NodeType getNodeType() {
         return nodeType;

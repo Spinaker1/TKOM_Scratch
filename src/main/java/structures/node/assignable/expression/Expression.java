@@ -1,9 +1,10 @@
-package node;
+package structures.node.assignable.expression;
 
-import token.TokenType;
+import structures.node.NodeType;
+import structures.node.assignable.Operand;
+import structures.token.TokenType;
 
 import java.util.LinkedList;
-import java.util.ListIterator;
 
 public class Expression extends Operand {
     private LinkedList<TokenType> operators;

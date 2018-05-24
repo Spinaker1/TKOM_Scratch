@@ -1,4 +1,7 @@
-package node;
+package structures.node.assignable.literal;
+
+import structures.node.NodeType;
+import structures.node.assignable.Operand;
 
 public class IntLiteral extends Operand {
     private int value;

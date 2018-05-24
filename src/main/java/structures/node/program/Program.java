@@ -1,4 +1,6 @@
-package node;
+package structures.node.program;
+
+import structures.node.event.Event;
 
 import java.util.LinkedList;
 

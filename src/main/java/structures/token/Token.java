@@ -1,7 +1,8 @@
-package token;
+package structures.token;
 
 import input.InputManager;
-import node.Function;
+import structures.node.event.EventType;
+import structures.node.assignable.function.FunctionType;
 
 public class Token {
     private TokenType tokenType;

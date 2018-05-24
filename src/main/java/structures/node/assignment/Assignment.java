@@ -1,4 +1,9 @@
-package node;
+package structures.node.assignment;
+
+import structures.node.Node;
+import structures.node.NodeType;
+import structures.node.assignable.Assignable;
+import structures.node.assignable.variable.Variable;
 
 public class Assignment extends Node {
     private Variable variable;

@@ -1,6 +1,8 @@
-package node;
+package structures.node.assignable.function;
 
-import token.FunctionType;
+import structures.node.NodeType;
+import structures.node.assignable.Assignable;
+import structures.node.assignable.Operand;
 
 import java.util.LinkedList;
 

@@ -1,4 +1,4 @@
-package token;
+package structures.token;
 
 public enum TokenType {
     INTEGER,

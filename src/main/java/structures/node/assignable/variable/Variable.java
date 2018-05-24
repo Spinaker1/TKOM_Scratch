@@ -1,4 +1,7 @@
-package node;
+package structures.node.assignable.variable;
+
+import structures.node.NodeType;
+import structures.node.assignable.Operand;
 
 public class Variable extends Operand {
     private String name;

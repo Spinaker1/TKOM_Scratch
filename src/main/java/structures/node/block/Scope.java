@@ -1,4 +1,6 @@
-package node;
+package structures.node.block;
+
+import structures.node.assignable.variable.Variable;
 
 import java.util.HashMap;
 import java.util.Map;

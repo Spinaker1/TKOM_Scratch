@@ -6,18 +6,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import lexer.Lexer;
-import node.Event;
-import node.Program;
 import parser.Parser;
 import semantic.SemanticParser;
-import token.EventType;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import structures.node.event.EventType;
+import structures.node.program.Program;
 
 public class Main extends Application {
     private final int WIDTH = 1000;

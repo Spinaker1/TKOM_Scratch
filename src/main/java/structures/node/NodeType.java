@@ -1,9 +1,8 @@
-package node;
+package structures.node;
 
 public enum NodeType {
     ASSIGNMENT,
     BLOCK,
-    CONDITION,
     EVENT,
     EXPRESSION,
     FUNCTION,
