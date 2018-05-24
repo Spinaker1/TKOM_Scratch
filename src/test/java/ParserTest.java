@@ -18,7 +18,7 @@ public class ParserTest {
     public void shouldParseEvents() {
         try {
             String text = "MYSZ() {} START(){} " +
-                    "SCIANA (){} KOLIZJA(kangurek){} ";
+                    "SCIANA (){}";
             Parser parser = new Parser(new Lexer(new InputManager(text)));
 
             Program program = parser.parse();
@@ -28,7 +28,6 @@ public class ParserTest {
             assertEquals(EventType.MOUSE, events.get(0).getEventType());
             assertEquals(EventType.START, events.get(1).getEventType());
             assertEquals(EventType.WALL, events.get(2).getEventType());
-            assertEquals(EventType.COLLISION, events.get(3).getEventType());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -75,7 +74,7 @@ public class ParserTest {
     @Test
     public void shouldParseIfStatementAndFunction() {
         try {
-            Parser parser = new Parser(new Lexer(new InputManager("KOLIZJA(auto) { " +
+            Parser parser = new Parser(new Lexer(new InputManager("START() { " +
                     "jezeli[1+2*3 != 5 && 3 < 5 || y+2+3 > k*s] { " +
                     "idzLewo(10); " +
                     "} " +

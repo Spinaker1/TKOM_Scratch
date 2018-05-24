@@ -18,7 +18,6 @@ class KeywordsHashmap {
 
         put("START", new Token(TokenType.EVENT, EventType.START));
         put("MYSZ", new Token(TokenType.EVENT, EventType.MOUSE));
-        put("KOLIZJA", new Token(TokenType.EVENT, EventType.COLLISION));
         put("SCIANA", new Token(TokenType.EVENT, EventType.WALL));
 
         put("idz", new Token(TokenType.FUNCTION, FunctionType.GO));

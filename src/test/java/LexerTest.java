@@ -483,22 +483,19 @@ public class LexerTest {
     @Test
     public void shouldParseEvents() {
         try {
-            String value = "SCIANA START KOLIZJA MYSZ";
+            String value = "SCIANA START MYSZ";
             Lexer lexer = new Lexer(new InputManager(value));
 
             Token token1 = lexer.getNextToken();
             Token token2 = lexer.getNextToken();
             Token token3 = lexer.getNextToken();
-            Token token4 = lexer.getNextToken();
 
             assertEquals(TokenType.EVENT, token1.getTokenType());
             assertEquals(EventType.WALL, token1.getEventType());
             assertEquals(TokenType.EVENT, token2.getTokenType());
             assertEquals(EventType.START, token2.getEventType());
             assertEquals(TokenType.EVENT, token3.getTokenType());
-            assertEquals(EventType.COLLISION, token3.getEventType());
-            assertEquals(TokenType.EVENT, token4.getTokenType());
-            assertEquals(EventType.MOUSE, token4.getEventType());
+            assertEquals(EventType.MOUSE, token3.getEventType());
         } catch (Exception e) {
             e.printStackTrace();
             fail();
