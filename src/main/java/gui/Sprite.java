@@ -155,7 +155,6 @@ public class Sprite extends ImageView {
                                 Duration.millis(FRAME_DURATION),
                                 event -> {
                                     setX(getX() + MOVE_STEP);
-                                    System.out.println(timeline.getCurrentTime());
                                 }
                         ));
                 timeline.setCycleCount(frames);
