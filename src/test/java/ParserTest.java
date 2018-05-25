@@ -333,13 +333,11 @@ public class ParserTest {
     @Test
     public void shouldParseRepeatIfStatement() {
         try {
-            String value = " START() { pobierzX()  }";
+            String value = " START() { powtorzJezeli[pobierzRotacje() < 180] {} }";
             Parser parser = new Parser(new Lexer(new InputManager(value)));
             parser.parse();
-            fail();
         } catch (Exception e) {
-            e.printStackTrace();
-            assertEquals("Oczekiwane wyrażenie: ;",e.getMessage());
+            fail();
         }
     }
 }

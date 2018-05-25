@@ -34,11 +34,11 @@ public class Parser {
         LinkedList<Event> eventList = new LinkedList<>();
 
         Event event;
-        while((event = parseEvent()) != null) {
+        while ((event = parseEvent()) != null) {
             eventList.add(event);
         }
 
-        accept(currentToken,TokenType.EOF,"Nieprawidłowe wyrażenie.");
+        accept(currentToken, TokenType.EOF, "Nieprawidłowe wyrażenie.");
 
         return new Program(eventList);
     }
@@ -85,15 +85,15 @@ public class Parser {
         LinkedList<Node> instructions = new LinkedList<>();
         Node instruction;
         getToken();
-        while((instruction = parseInstruction()) != null ||
+        while ((instruction = parseInstruction()) != null ||
                 (instruction = parseIfStatement()) != null ||
                 (instruction = parseRepeatIfStatement()) != null ||
                 (instruction = parseRepeatStatement()) != null) {
-           instructions.add(instruction);
-           getToken();
+            instructions.add(instruction);
+            getToken();
         }
 
-        accept(currentToken,TokenType.BRACKET_CLOSE,("Oczekiwane wyrażenie: }"));
+        accept(currentToken, TokenType.BRACKET_CLOSE, ("Oczekiwane wyrażenie: }"));
 
         return new Block(instructions);
     }
@@ -103,8 +103,7 @@ public class Parser {
 
         if ((instruction = parseAssignment()) != null) {
             accept(currentToken, TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
-        }
-        else if ((instruction = parseFunction()) != null) {
+        } else if ((instruction = parseFunction()) != null) {
             accept(getToken(), TokenType.SEMICOLON, "Oczekiwane wyrażenie: ;");
         }
 
@@ -112,7 +111,7 @@ public class Parser {
     }
 
     private Function parseFunction() throws Exception {
-        if (!checkTokenType(currentToken,TokenType.FUNCTION)) {
+        if (!checkTokenType(currentToken, TokenType.FUNCTION)) {
             return null;
         }
 
@@ -147,7 +146,7 @@ public class Parser {
     }
 
     private Assignment parseAssignment() throws Exception {
-        if (!checkTokenType(currentToken,TokenType.VARIABLE)) {
+        if (!checkTokenType(currentToken, TokenType.VARIABLE)) {
             return null;
         }
 
@@ -164,7 +163,7 @@ public class Parser {
     private Assignable parseAssignable() throws Exception {
         Assignable assignable;
         if (((assignable = parseStringLiteral()) == null) &&
-            ((assignable = parseAdditiveExpression()) == null)) {
+                ((assignable = parseAdditiveExpression()) == null)) {
             throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
         }
 
@@ -172,7 +171,7 @@ public class Parser {
     }
 
     private RepeatStatement parseRepeatStatement() throws Exception {
-        if (!checkTokenType(currentToken,TokenType.REPEAT)) {
+        if (!checkTokenType(currentToken, TokenType.REPEAT)) {
             return null;
         }
 
@@ -187,18 +186,22 @@ public class Parser {
         if ((codeBlock = parseBlock()) == null)
             throw new Exception();
 
-        return new RepeatStatement(codeBlock,repeatingCount);
+        return new RepeatStatement(codeBlock, repeatingCount);
     }
 
     private IfStatement parseIfStatement() throws Exception {
-        if (!checkTokenType(currentToken,TokenType.IF)) {
+        if (!checkTokenType(currentToken, TokenType.IF)) {
             return null;
         }
 
         accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: [");
 
         getToken();
-        Expression condition = parseCondition();
+
+        Expression condition;
+        if ((condition = parseCondition()) == null) {
+            throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
+        }
 
         accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: ]");
 
@@ -210,14 +213,18 @@ public class Parser {
     }
 
     private RepeatIfStatement parseRepeatIfStatement() throws Exception {
-        if (!checkTokenType(currentToken,TokenType.REPEAT_IF)) {
+        if (!checkTokenType(currentToken, TokenType.REPEAT_IF)) {
             return null;
         }
 
         accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: [");
 
         getToken();
-        Expression condition = parseCondition();
+
+        Expression condition;
+        if ((condition = parseCondition()) == null) {
+            throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
+        }
 
         accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: ]");
 
@@ -229,50 +236,70 @@ public class Parser {
     }
 
     private Expression parseCondition() throws Exception {
-        System.out.println("or");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
-        operands.add(parseAndCondition());
-        while (checkTokenType(currentToken,TokenType.OR )) {
-            operators.add(currentToken.getTokenType());
-            getToken();
-            operands.add(parseAndCondition());
+        Operand operand;
+        if ((operand = parseAndCondition()) == null) {
+            return null;
+        } else {
+            operands.add(operand);
         }
 
-        return new Expression(operators,operands);
+        while (checkTokenType(currentToken, TokenType.OR)) {
+            operators.add(currentToken.getTokenType());
+            getToken();
+
+            if ((operand = parseAndCondition()) == null) {
+                return null;
+            } else {
+                operands.add(operand);
+            }
+        }
+
+        return new Expression(operators, operands);
     }
 
     private Expression parseAndCondition() throws Exception {
-        System.out.println("and");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
-        operands.add(parseRelationalCondition());
-        while (checkTokenType(currentToken,TokenType.AND )) {
-            operators.add(currentToken.getTokenType());
-            getToken();
-            operands.add(parseRelationalCondition());
+        Operand operand;
+        if ((operand = parseRelationalCondition()) == null) {
+            return null;
+        } else {
+            operands.add(operand);
         }
 
-        return new Expression(operators,operands);
+        while (checkTokenType(currentToken, TokenType.AND)) {
+            operators.add(currentToken.getTokenType());
+            getToken();
+
+            if ((operand = parseRelationalCondition()) == null) {
+                return null;
+            } else {
+                operands.add(operand);
+            }
+        }
+
+        return new Expression(operators, operands);
     }
 
     private Expression parseRelationalCondition() throws Exception {
-        if (checkTokenType(currentToken,TokenType.SQUARE_BRACKET_OPEN)) {
+        if (checkTokenType(currentToken, TokenType.SQUARE_BRACKET_OPEN)) {
             getToken();
             Expression condition = parseCondition();
-            accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE,"");
+            accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "");
             getToken();
 
             return condition;
         }
 
-        if (checkTokenType(currentToken,TokenType.NEGATION)) {
-            accept(getToken(), TokenType.SQUARE_BRACKET_OPEN,"");
+        if (checkTokenType(currentToken, TokenType.NEGATION)) {
+            accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "");
             getToken();
             Expression condition = parseCondition();
-            accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE,"");
+            accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "");
             getToken();
 
             condition.setNegated(true);
@@ -282,8 +309,14 @@ public class Parser {
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
-        operands.add(parseAdditiveExpression());
-        if (checkTokenType(currentToken,TokenType.EQUAL) ||
+        Operand operand;
+        if ((operand = parseAdditiveExpression()) == null) {
+            return null;
+        } else {
+            operands.add(operand);
+        }
+
+        if (checkTokenType(currentToken, TokenType.EQUAL) ||
                 checkTokenType(currentToken, TokenType.NOT_EQUAL) ||
                 checkTokenType(currentToken, TokenType.LESS) ||
                 checkTokenType(currentToken, TokenType.LESS_EQUAL) ||
@@ -292,13 +325,17 @@ public class Parser {
                 ) {
             operators.add(currentToken.getTokenType());
             getToken();
-            operands.add(parseAdditiveExpression());
-        }
-        else {
+
+            if ((operand = parseAdditiveExpression()) == null) {
+                return null;
+            } else {
+                operands.add(operand);
+            }
+        } else {
             throw new Exception("Oczekiwany operator porównania.");
         }
 
-        return new Expression(operators,operands);
+        return new Expression(operators, operands);
     }
 
     private Expression parseAdditiveExpression() throws Exception {
@@ -313,7 +350,7 @@ public class Parser {
         }
 
         while (checkTokenType(currentToken, TokenType.ADD) ||
-                checkTokenType(currentToken, TokenType.MINUS) ) {
+                checkTokenType(currentToken, TokenType.MINUS)) {
             operators.add(currentToken.getTokenType());
             getToken();
 
@@ -339,7 +376,7 @@ public class Parser {
         }
 
         while (checkTokenType(getToken(), TokenType.MULTIPLY) ||
-                checkTokenType(currentToken, TokenType.DIVIDE) ) {
+                checkTokenType(currentToken, TokenType.DIVIDE)) {
             operators.add(currentToken.getTokenType());
             getToken();
 
@@ -354,7 +391,7 @@ public class Parser {
     }
 
     private Operand parsePrimaryExpression() throws Exception {
-        switch(currentToken.getTokenType()) {
+        switch (currentToken.getTokenType()) {
             case VARIABLE:
                 return parseVariable();
 
@@ -368,19 +405,23 @@ public class Parser {
             case PARENTHESIS_OPEN:
                 getToken();
 
-                Operand expression = parseAdditiveExpression();
-                accept(currentToken,TokenType.PARENTHESIS_CLOSE,"");
+                Operand expression;
+                if ((expression = parseAdditiveExpression()) == null) {
+                    return null;
+                }
+
+                accept(currentToken, TokenType.PARENTHESIS_CLOSE, "");
 
                 return expression;
 
-                default:
-                    return null;
+            default:
+                return null;
         }
     }
 
     private IntLiteral parseIntLiteral() throws Exception {
         boolean isNegative = false;
-        if (checkTokenType(currentToken,TokenType.MINUS)) {
+        if (checkTokenType(currentToken, TokenType.MINUS)) {
             isNegative = true;
             getToken();
         }
@@ -394,7 +435,7 @@ public class Parser {
     }
 
     private StringLiteral parseStringLiteral() throws Exception {
-        if (!checkTokenType(currentToken,TokenType.STRING)) {
+        if (!checkTokenType(currentToken, TokenType.STRING)) {
             return null;
         }
 
