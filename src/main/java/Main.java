@@ -85,7 +85,6 @@ public class Main extends Application {
 
                 errorTextArea.setText("Program skompilował się pomyślnie.");
             } catch (Exception exc) {
-                exc.printStackTrace();
                 String errorText = "Błąd:\n" + exc.getMessage() + "\nLinia: "
                         + source.getLineNumber() + " Znak: " + source.getPositionInLine();
                 errorTextArea.setText(errorText);
@@ -138,9 +137,6 @@ public class Main extends Application {
             }
             catch (Exception e) {
                 String errorText = "Błąd! Zatrzymano wykonanie programu.\n" + e.getMessage();
-
-                e.printStackTrace();
-
                 errorTextArea.setText(errorText);
                 stopSpriteThread();
             }

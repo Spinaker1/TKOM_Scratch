@@ -163,8 +163,9 @@ public class Parser {
 
     private Assignable parseAssignable() throws Exception {
         Assignable assignable;
-        if ((assignable = parseStringLiteral()) == null) {
-            assignable = parseAdditiveExpression();
+        if (((assignable = parseStringLiteral()) == null) &&
+            ((assignable = parseAdditiveExpression()) == null)) {
+            throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
         }
 
         return assignable;
@@ -194,12 +195,12 @@ public class Parser {
             return null;
         }
 
-        accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: (");
+        accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: [");
 
         getToken();
         Expression condition = parseCondition();
 
-        accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: )");
+        accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: ]");
 
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
@@ -213,12 +214,12 @@ public class Parser {
             return null;
         }
 
-        accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: (");
+        accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "Oczekiwane wyrażenie: [");
 
         getToken();
         Expression condition = parseCondition();
 
-        accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: )");
+        accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "Oczekiwane wyrażenie: ]");
 
         Block codeBlock;
         if ((codeBlock = parseBlock()) == null)
@@ -278,8 +279,6 @@ public class Parser {
             return condition;
         }
 
-
-        System.out.println("relational");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
@@ -303,29 +302,38 @@ public class Parser {
     }
 
     private Expression parseAdditiveExpression() throws Exception {
-        System.out.println("add");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
-        operands.add(parseMultiplicativeExpression());
+        Operand operand;
+        if ((operand = parseMultiplicativeExpression()) == null) {
+            return null;
+        } else {
+            operands.add(operand);
+        }
+
         while (checkTokenType(currentToken, TokenType.ADD) ||
                 checkTokenType(currentToken, TokenType.MINUS) ) {
             operators.add(currentToken.getTokenType());
             getToken();
-            operands.add(parseMultiplicativeExpression());
+
+            if ((operand = parseMultiplicativeExpression()) == null) {
+                return null;
+            } else {
+                operands.add(operand);
+            }
         }
 
         return new Expression(operators, operands);
     }
 
     private Expression parseMultiplicativeExpression() throws Exception {
-        System.out.println("mul");
         LinkedList<Operand> operands = new LinkedList<>();
         LinkedList<TokenType> operators = new LinkedList<>();
 
         Operand operand;
         if ((operand = parsePrimaryExpression()) == null) {
-            throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
+            return null;
         } else {
             operands.add(operand);
         }
@@ -336,7 +344,7 @@ public class Parser {
             getToken();
 
             if ((operand = parsePrimaryExpression()) == null) {
-                throw new Exception("Nie podano operandu lub nieprawidłowy typ operandu.");
+                return null;
             } else {
                 operands.add(operand);
             }
@@ -346,7 +354,6 @@ public class Parser {
     }
 
     private Operand parsePrimaryExpression() throws Exception {
-        System.out.println("pri");
         switch(currentToken.getTokenType()) {
             case VARIABLE:
                 return parseVariable();
