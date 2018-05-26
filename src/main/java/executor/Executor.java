@@ -289,6 +289,9 @@ public class Executor {
                     case DIVIDE:
                         value /= executeAssignable(operand, scope);
                         break;
+                    case MODULO:
+                        value %= executeAssignable(operand, scope);
+                        break;
                 }
             }
 

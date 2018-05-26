@@ -264,7 +264,7 @@ public class Sprite extends ImageView {
         pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(e -> pane.getChildren().remove(label));
         pause.play();
-        sleep(3);
+        sleep(4);
     }
 
     public void sleep(int seconds) {
@@ -286,6 +286,7 @@ public class Sprite extends ImageView {
         if (timeline != null) {
             timeline.stop();
         }
+
         if (pause != null) {
             pause.stop();
         }

@@ -61,7 +61,10 @@ public class Main extends Application {
         Button button1 = new Button("Wykonaj");
         setupExecuteButton(button1);
 
-        hBox.getChildren().addAll(button, button1);
+        Button button2 = new Button("Zakończ");
+        setupStopButton(button2);
+
+        hBox.getChildren().addAll(button, button1, button2);
         root.getChildren().add(hBox);
 
         collisionThread.start();
@@ -98,9 +101,13 @@ public class Main extends Application {
         button.setOnAction(e -> {
             startNewSpriteThread(EventType.START);
 
-            sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1 -> {
-                startNewSpriteThread(EventType.MOUSE);
-            });
+            sprite.addEventFilter(MouseEvent.MOUSE_PRESSED, e1 -> startNewSpriteThread(EventType.MOUSE));
+        });
+    }
+
+    private void setupStopButton(Button button) {
+        button.setOnAction(e -> {
+            stopSpriteThread();
         });
     }
 

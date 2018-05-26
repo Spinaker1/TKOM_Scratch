@@ -288,7 +288,12 @@ public class Parser {
     private Expression parseRelationalCondition() throws Exception {
         if (checkTokenType(currentToken, TokenType.SQUARE_BRACKET_OPEN)) {
             getToken();
-            Expression condition = parseCondition();
+
+            Expression condition;
+            if ((condition = parseCondition()) == null) {
+                return null;
+            }
+
             accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "");
             getToken();
 
@@ -298,7 +303,12 @@ public class Parser {
         if (checkTokenType(currentToken, TokenType.NEGATION)) {
             accept(getToken(), TokenType.SQUARE_BRACKET_OPEN, "");
             getToken();
-            Expression condition = parseCondition();
+
+            Expression condition;
+            if ((condition = parseCondition()) == null) {
+                return null;
+            }
+
             accept(currentToken, TokenType.SQUARE_BRACKET_CLOSE, "");
             getToken();
 
@@ -376,7 +386,8 @@ public class Parser {
         }
 
         while (checkTokenType(getToken(), TokenType.MULTIPLY) ||
-                checkTokenType(currentToken, TokenType.DIVIDE)) {
+                checkTokenType(currentToken, TokenType.DIVIDE) ||
+                checkTokenType(currentToken, TokenType.MODULO)) {
             operators.add(currentToken.getTokenType());
             getToken();
 
